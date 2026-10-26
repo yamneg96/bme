@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Basic Optics Quiz: Slides 1–30</title>
+  <meta name="description" content="Practice quiz on the first 30 slides of Basic Optics: light, the photoelectric effect, reflection, refraction, total internal reflection and dispersion.">
+  <meta name="theme-color" content="#1f4fd8">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('optics.theme');
+        if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="assets/tailwind.css">
+</head>
+<body data-scope="home" class="min-h-screen bg-bg font-sans text-ink antialiased">
+  <a href="#app" class="focus-ring sr-only rounded-md bg-accent px-4 py-2 text-accentfg focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50">Skip to the quiz</a>
+
+  <div class="spectrum-rule" aria-hidden="true"></div>
+  <header class="border-b border-line print:hidden">
+    <div class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-8 gap-y-3 px-4 py-4 sm:px-6">
+      <a href="home.html" class="focus-ring flex items-center gap-3 rounded-md">
+        <svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0f1b2d"/><path d="M32 12 50 46H14Z" fill="none" stroke="#e6ecf5" stroke-width="3" stroke-linejoin="round"/><path d="M4 34h19" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M40 38l20 8M41 34h20M40 30l20-8" stroke="#8eb0ff" stroke-width="3" stroke-linecap="round"/></svg>
+        <span class="font-serif text-lg font-semibold tracking-tight">Basic Optics practice</span>
+      </a>
+      <nav aria-label="Quiz pages" class="flex items-center gap-1 text-sm">
+        <a href="home.html" aria-current="page" class="focus-ring rounded-md px-3 py-2 bg-soft font-semibold text-ink">Slides 1–30</a>
+        <a href="all.html"  class="focus-ring rounded-md px-3 py-2 text-mute hover:text-ink">All slides</a>
+        <button id="theme-toggle" type="button" aria-label="Dark mode" title="Dark mode" class="focus-ring ml-2 rounded-md border border-line p-2 text-mute hover:text-ink">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+        </button>
+      </nav>
+    </div>
+  </header>
+  <div id="quizbar" class="sticky top-0 z-20 hidden border-b border-line bg-bg/95 backdrop-blur print:hidden"><div id="quizbar-inner" class="mx-auto max-w-5xl px-4 py-3 sm:px-6"></div></div>
+
+  <main class="mx-auto max-w-5xl px-4 pb-24 pt-10 sm:px-6 sm:pt-14">
+    <div id="hero" class="mb-12 max-w-2xl print:hidden">
+      <h1 class="font-serif text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">Check what you know from slides 1 to 30</h1>
+      <p class="mt-4 text-lg text-mute">Light as a wave and a photon, the photoelectric effect, reflection, Snell's law, total internal reflection and prisms. Answer every question, then submit to see your mark.</p>
+    </div>
+    <div id="app" aria-live="polite">
+      <noscript><p class="text-bad">This quiz needs JavaScript. Enable it in your browser and reload the page.</p></noscript>
+    </div>
+  </main>
+
+  <footer class="border-t border-line print:hidden">
+    <div class="mx-auto max-w-5xl px-4 py-6 text-sm text-mute sm:px-6">
+      Based on the Chapter 2 Basic Optics slides, School of Biomedical Engineering, CTBE, Addis Ababa University. Your best score is saved in this browser only.
+    </div>
+  </footer>
+
+  <div id="toast" role="status" aria-live="polite" class="pointer-events-none fixed bottom-6 left-1/2 z-50 max-w-[90vw] -translate-x-1/2 translate-y-2 rounded-md bg-ink px-4 py-3 text-sm text-bg opacity-0 shadow-lg transition duration-200 print:hidden"></div>
+
+  <script src="assets/questions.js" charset="utf-8"></script>
+  <script src="assets/app.js" charset="utf-8"></script>
+</body>
+</html>
