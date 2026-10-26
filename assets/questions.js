@@ -2,7 +2,7 @@
   Question bank for "Basic Optics" (Chapter 2 slides).
   Fields:
     id    unique id
-    s     slide reference shown to the student. A question appears on home.html when its highest
+    s     slide reference shown to the student. A question appears on index.html when its highest
           slide number is <= 30; all.html shows every question.
     topic topic name (used for the topic filter and the score breakdown)
     lv    "easy" | "medium" | "tricky"

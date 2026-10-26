@@ -1,5 +1,5 @@
 /* Basic Optics practice quiz - vanilla JS, no build step.
-   Pages: home.html (data-scope="home", slides 1-30) and all.html (data-scope="all", slides 1-100). */
+   Pages: index.html (data-scope="home", slides 1-30) and all.html (data-scope="all", slides 1-100). */
 (function () {
   "use strict";
 

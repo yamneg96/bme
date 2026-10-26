@@ -4,8 +4,8 @@ Static site (HTML, Tailwind CSS, vanilla JS). No server and no build step are ne
 
 | Page | What it covers |
 | --- | --- |
-| `home.html` | 35 questions from slides 1–30 |
-| `all.html` | 111 questions from slides 1–100 (includes everything on `home.html`) |
+| `index.html` | 35 questions from slides 1–30 |
+| `all.html` | 111 questions from slides 1–100 (includes everything on `index.html`) |
 
 Students choose the number of questions and topics, answer every question, then submit. The mark, score by topic and difficulty, slides to revisit and an explanation for every question are shown only after submitting. Submit stays blocked until every question is answered.
 
@@ -17,17 +17,17 @@ Students choose the number of questions and topics, answer every question, then 
 
 Or from a terminal: `npx vercel --prod` inside this folder.
 
-`vercel.json` serves `/` as `home.html` and enables clean URLs (`/home`, `/all`).
+`vercel.json` enables clean URLs (`/all`); `/` is served from `index.html`.
 
 ## Run locally
 
-Open `home.html` in a browser, or run `python3 -m http.server 8000` and visit http://localhost:8000/home.html.
+Open `index.html` in a browser, or run `python3 -m http.server 8000` and visit http://localhost:8000/index.html.
 
 ## Edit the questions
 
 All questions live in `assets/questions.js`, one per line. Fields:
 
-- `s` slide reference. A question shows on `home.html` only if its highest slide number is 30 or less.
+- `s` slide reference. A question shows on `index.html` only if its highest slide number is 30 or less.
 - `t` `"mcq"` (options in `o`, correct option index in `a`), `"tf"` (`a` is true or false), or `"num"` (`a` is the answer, `tol` the allowed error, `u` the unit label).
 - `e` explanation shown after submitting.
 
