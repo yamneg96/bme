@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
   ArrowRight,
   BookOpen,
@@ -91,6 +91,23 @@ function ThemeToggle() {
 export function App() {
   const [chosen, setChosen] = useState<string | null>(null)
 
+  // Coming back with the browser's Back button restores this page from the
+  // back/forward cache in its "leaving" state — reset it so the hub is usable.
+  useEffect(() => {
+    const reset = () => setChosen(null)
+    window.addEventListener("pageshow", reset)
+    return () => window.removeEventListener("pageshow", reset)
+  }, [])
+
+  // Warm the cache for an exam page as soon as the pointer/focus is on its card.
+  const prefetch = (href: string) => {
+    if (document.head.querySelector(`link[rel="prefetch"][href="${href}"]`)) return
+    const l = document.createElement("link")
+    l.rel = "prefetch"
+    l.href = href
+    document.head.appendChild(l)
+  }
+
   const open = (exam: Exam) => {
     if (chosen) return
     setChosen(exam.id)
@@ -159,6 +176,8 @@ export function App() {
               >
                 <a
                   href={exam.href}
+                  onPointerEnter={() => prefetch(exam.href)}
+                  onFocus={() => prefetch(exam.href)}
                   onClick={(e) => {
                     e.preventDefault()
                     open(exam)
