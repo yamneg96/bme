@@ -1,0 +1,6 @@
+{
+  "redirects": [{ "source": "/", "destination": "/home.html", "permanent": false }],
+  "headers": [
+    { "source": "/(.*)", "headers": [{ "key": "X-Content-Type-Options", "value": "nosniff" }] }
+  ]
+}

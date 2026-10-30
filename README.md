@@ -1,45 +1,68 @@
-# Basic Optics practice quiz
+# Children Quiz — Exam Practice Hub
 
-Static site (HTML, Tailwind CSS, vanilla JS). No server and no build step are needed to run or deploy it.
+A React + Vite + shadcn/ui landing page that asks **"Which exam are you working on today?"** and sends the student to the exam's own URL. The exams themselves are self-contained static sites served from `public/`.
 
-| Page | What it covers |
+| Exam | URL |
 | --- | --- |
-| `index.html` | 35 questions from slides 1–30 |
-| `all.html` | 111 questions from slides 1–100 (includes everything on `index.html`) |
+| Introduction to Economics · Chapters 1–3 | `/economics-quiz/home.html` |
+| Introduction to Economics · Full exam (6 chapters) | `/economics-quiz/all.html` |
+| Basic Optics · Slides 1–30 | `/optics-quiz/index.html` |
+| Basic Optics · Slides 1–100 | `/optics-quiz/all.html` |
 
-Students choose the number of questions and topics, answer every question, then submit. The mark, score by topic and difficulty, slides to revisit and an explanation for every question are shown only after submitting. Submit stays blocked until every question is answered.
+## Project layout
 
-## Deploy on Vercel
-
-1. Push this folder to a GitHub repository (`node_modules` is already git-ignored).
-2. In Vercel choose **Add New > Project**, import the repository.
-3. Framework Preset: **Other**. Leave Build Command and Output Directory empty. Deploy.
-
-Or from a terminal: `npx vercel --prod` inside this folder.
-
-`vercel.json` enables clean URLs (`/all`); `/` is served from `index.html`.
+```
+.
+├── src/                    React app (landing page, shadcn components, theme provider)
+├── public/
+│   ├── economics-quiz/     Economics exam (vanilla JS, one question per page, light/dark theme)
+│   └── optics-quiz/        Optics exam (vanilla JS + Tailwind CSS)
+├── .claude/                Local notes / source module text (git-ignored)
+├── components.json         shadcn/ui configuration
+└── vite.config.ts
+```
 
 ## Run locally
 
-Open `index.html` in a browser, or run `python3 -m http.server 8000` and visit http://localhost:8000/index.html.
-
-## Edit the questions
-
-All questions live in `assets/questions.js`, one per line. Fields:
-
-- `s` slide reference. A question shows on `index.html` only if its highest slide number is 30 or less.
-- `t` `"mcq"` (options in `o`, correct option index in `a`), `"tf"` (`a` is true or false), or `"num"` (`a` is the answer, `tol` the allowed error, `u` the unit label).
-- `e` explanation shown after submitting.
-
-Answers are embedded in this file, so anyone who opens the browser developer tools can read them. That is fine for practice, not for a graded exam.
-
-## Change the styling
-
-Tailwind classes are compiled into `assets/tailwind.css` (already built and committed). After changing classes in the HTML or `assets/app.js`, rebuild:
-
-```
+```bash
 npm install
-npm run build:css
+npm run dev        # http://localhost:5173
 ```
 
-Colors are CSS variables at the top of `src/input.css` (light and dark).
+Other scripts: `npm run build` (type-check + production build to `dist/`), `npm run preview`, `npm run lint`, `npm run typecheck`.
+
+The shadcn project was created with:
+
+```bash
+npx shadcn@latest init --preset b0 --template vite --pointer
+```
+
+Add more components with `npx shadcn@latest add <component>`.
+
+## Landing page
+
+- Animated gradient/grid background and staggered card entrance; cards lift on hover and the page fades out as you open an exam.
+- Light / dark toggle (top right). Press `d` to toggle too — it follows the system theme by default.
+- To add an exam, add an entry to the `EXAMS` array in `src/App.tsx` and put its static files under `public/<name>/`.
+
+## Economics exam features
+
+- One question per page with previous / next, a question map, "mark for review" and keyboard shortcuts (`←` `→`, `A`–`D`, `F`).
+- Timer defaults to **1:30 per question** (total = questions × 1:30). Switchable to 1:00 or 2:00 per question, a custom total, or no limit; the exam is auto-marked when time runs out.
+- Dashboard with exam starts, completed attempts, best score and last score (stored in `localStorage`).
+- Light and dark theme.
+- Final mark, per-chapter breakdown and an explanation for every question.
+
+## Deploy
+
+Deploy the repo to Vercel (or any static host) as a **Vite** project: build command `npm run build`, output directory `dist`.
+
+## Git workflow
+
+Remote: `origin` → `https://github.com/yamneg96/bme.git`, branch `main`.
+
+```bash
+git add -A
+git commit -m "describe the change"
+git push origin main
+```

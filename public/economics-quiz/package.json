@@ -1,0 +1,12 @@
+{
+  "name": "intro-economics-exam",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Multi-page Introduction to Economics exam practice site (static, Tailwind CSS).",
+  "scripts": {
+    "build": "tailwindcss -i ./src/input.css -o ./css/tailwind.css --minify"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.17"
+  }
+}
