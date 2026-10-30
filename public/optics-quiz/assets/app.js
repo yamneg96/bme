@@ -63,7 +63,19 @@
     startedAt: 0,
     result: null,
     reviewFilter: "all",
+    mode: "exam",       // "exam" | "practice"
+    marking: "end",     // "end" | "instant"
+    hints: {},          // id -> true once a hint was opened
+    shown: {},          // id -> true once the answer + explanation were revealed
+    checked: {},        // id -> true once instant marking has marked the answer
   };
+  var prefsKey = "optics.prefs";
+  try {
+    var pf = JSON.parse(store.get(prefsKey) || "null");
+    if (pf && (pf.mode === "practice" || pf.mode === "exam")) S.mode = pf.mode;
+    if (pf && (pf.marking === "instant" || pf.marking === "end")) S.marking = pf.marking;
+  } catch (e) { /* ignore bad prefs */ }
+  function savePrefs() { store.set(prefsKey, JSON.stringify({ mode: S.mode, marking: S.marking })); }
   var timerId = null;
   var bestKey = "optics.best." + SCOPE;
 
@@ -155,7 +167,7 @@
         '<div>' +
           '<h2 id="setup-h" class="font-serif text-2xl font-semibold tracking-tight">Set up your quiz</h2>' +
           '<p class="mt-2 max-w-prose text-mute">Answer every question, then submit to get your mark with explanations and the slides to revisit. ' +
-            "Nothing is shown until you submit.</p>" +
+            (S.mode === "practice" ? "Hints and answers are available while you work." : "No hints or answers are shown until you finish.") + "</p>" +
         "</div>" +
         '<div><h3 class="mb-3 font-medium">Number of questions</h3><div class="flex flex-wrap gap-2" role="group" aria-label="Number of questions">' + sizeBtns + "</div></div>" +
         '<div><div class="mb-3 flex items-baseline justify-between gap-4"><h3 class="font-medium">Topics</h3>' +
@@ -163,6 +175,16 @@
           '<span class="px-2 text-mute" aria-hidden="true">/</span>' +
           '<button type="button" data-act="topics-none" class="focus-ring text-accent underline underline-offset-2">Clear</button></div></div>' +
           '<div class="flex flex-wrap gap-2" role="group" aria-label="Topics">' + topicBtns + "</div></div>" +
+        '<div class="grid gap-6 sm:grid-cols-2">' +
+          '<div><h3 class="mb-3 font-medium">Mode</h3><div class="seg" role="group" aria-label="Mode">' +
+            '<button type="button" data-act="mode" data-v="exam" aria-pressed="' + (S.mode === "exam") + '">\uD83D\uDCDD Exam</button>' +
+            '<button type="button" data-act="mode" data-v="practice" aria-pressed="' + (S.mode === "practice") + '">\uD83D\uDCA1 Practice</button></div>' +
+            '<p class="mt-2 text-sm text-mute">' + (S.mode === "practice" ? "Get a hint, or the answer with its explanation, whenever you are stuck." : "Real exam conditions: no hints and no answers until you finish.") + "</p></div>" +
+          '<div><h3 class="mb-3 font-medium">Marking</h3><div class="seg" role="group" aria-label="Marking">' +
+            '<button type="button" data-act="marking" data-v="end" aria-pressed="' + (S.marking === "end") + '">\uD83C\uDFC1 At the end</button>' +
+            '<button type="button" data-act="marking" data-v="instant" aria-pressed="' + (S.marking === "instant") + '">\u26A1 After each answer</button></div>' +
+            '<p class="mt-2 text-sm text-mute">' + (S.marking === "instant" ? "Each answer is marked as soon as you give it." : "Everything is marked together when you finish.") + "</p></div>" +
+        "</div>" +
         '<div><h3 class="mb-3 font-medium">Order</h3>' +
           '<label class="inline-flex cursor-pointer items-center gap-3">' +
           '<input id="opt-shuffle" type="checkbox" class="focus-ring h-5 w-5 rounded border-line accent-[rgb(var(--accent))]"' + (S.shuffle ? " checked" : "") + ">" +
@@ -200,6 +222,7 @@
     }
     S.items = buildItems(qs);
     S.ans = {};
+    S.hints = {}; S.shown = {}; S.checked = {};
     S.result = null;
     S.startedAt = Date.now();
     renderQuiz();
@@ -223,35 +246,111 @@
   var BADGE =
     "badge mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-line text-xs font-semibold text-mute";
 
-  function optionHtml(name, value, letter, text) {
+  function optionHtml(name, value, letter, text, st, selected, locked) {
     return (
-      '<label class="block cursor-pointer">' +
-      '<input class="peer sr-only" type="radio" name="' + name + '" value="' + value + '">' +
-      '<span class="' + OPT_BASE + '"><span class="' + BADGE + '" aria-hidden="true">' + letter + "</span>" +
-      '<span class="min-w-0 flex-1">' + text + "</span></span></label>"
+      '<label class="block cursor-pointer' + (locked ? " is-locked" : "") + '">' +
+      '<input class="peer sr-only" type="radio" name="' + name + '" value="' + value + '"' + (selected ? " checked" : "") + (locked ? " disabled" : "") + ">" +
+      '<span class="opt-box ' + OPT_BASE + (st ? " st-" + st : "") + '"><span class="' + BADGE + '" aria-hidden="true">' + letter + "</span>" +
+      '<span class="min-w-0 flex-1">' + text + (st === "elim" ? ' <span class="text-xs text-mute">(ruled out)</span>' : "") + "</span></span></label>"
     );
+  }
+
+  /* ---------- practice helpers: hints, instant marking ---------- */
+  function hashId(id) { var h = 0; for (var i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) % 9973; return h; }
+  function slideRef(q) { return "slide" + (/[–,-]/.test(q.s) ? "s " : " ") + q.s; }
+  function elimPositions(item) {
+    var q = item.q;
+    if (q.t !== "mcq") return [];
+    var h = hashId(q.id);
+    var wrong = item.order.map(function (orig, pos) { return orig === q.a ? -1 : pos; }).filter(function (p) { return p >= 0; });
+    wrong.sort(function (a, b) { return ((a + 1) * 2654435 + h) % 97 - ((b + 1) * 2654435 + h) % 97; });
+    return wrong.slice(0, 2);
+  }
+  function hintFor(item) {
+    var q = item.q, where = "Revisit " + slideRef(q) + " (" + q.topic + ").";
+    if (q.t === "mcq") {
+      var el = elimPositions(item).sort(function (a, b) { return a - b; }).map(function (p) { return LETTERS[p]; });
+      return "It is not " + el.join(" or ") + ". " + where;
+    }
+    if (q.t === "tf") {
+      var m = String(q.q).match(/\b(always|never|only|all|none|every|must|cannot)\b/i);
+      return (m ? "Watch the absolute word \u201C" + m[1] + "\u201D. " : "Read the statement carefully for qualifiers. ") + where;
+    }
+    var v = q.a, mag = "";
+    if (v === 0) mag = "The answer is zero or very close to it. ";
+    else {
+      var k = Math.floor(Math.log(Math.abs(v)) / Math.LN10);
+      mag = "The answer is " + (v < 0 ? "negative" : "positive") + ", between " + fmtNum(Math.pow(10, k)) + " and " + fmtNum(Math.pow(10, k + 1)) + (q.u ? " " + q.u : "") + ". ";
+    }
+    return mag + where;
+  }
+  function answerHtml(item) {
+    var q = item.q;
+    if (q.t === "mcq") { var pos = item.order.indexOf(q.a); return LETTERS[pos] + ". " + q.o[q.a]; }
+    if (q.t === "tf") return q.a ? "True" : "False";
+    return fmtNum(q.a) + (q.u ? " " + esc(q.u) : "");
+  }
+
+  function feedbackHtml(item) {
+    var q = item.q, id = q.id;
+    var practice = S.mode === "practice", instant = S.marking === "instant";
+    var revealed = !!S.shown[id], checked = instant && !!S.checked[id];
+    var out = "";
+    if (checked && !revealed) {
+      var ok = isCorrect(item);
+      out += '<div class="fbx ' + (ok ? "fbx-ok" : "fbx-bad") + '"><strong>' + (ok ? "\u2713 Correct" : "\u2717 Not quite") + "</strong>" +
+        (!practice ? " \u2014 answer locked; the full review comes when you submit." : ok ? "" : " \u2014 change your answer, or use a hint.") + "</div>";
+      if (practice && ok) out += '<p class="fbx fbx-why"><span class="font-semibold">Why: </span>' + q.e + "</p>";
+    }
+    if (practice && !revealed) {
+      if (S.hints[id]) out += '<div class="fbx fbx-hint">\uD83D\uDCA1 <strong>Hint:</strong> ' + esc(hintFor(item)) + "</div>";
+      var canReveal = !instant || (checked && !isCorrect(item));
+      out += '<div class="fb-actions">' +
+        (S.hints[id] ? "" : '<button type="button" class="fb-btn" data-act="hint" data-id="' + id + '">\uD83D\uDCA1 Hint</button>') +
+        (canReveal ? '<button type="button" class="fb-btn" data-act="reveal" data-id="' + id + '">\uD83D\uDC41 Show answer &amp; explanation</button>' : "") + "</div>";
+    }
+    if (revealed) {
+      out += '<div class="fbx fbx-hint"><strong>Answer: ' + answerHtml(item) + '</strong></div>' +
+        '<p class="fbx fbx-why"><span class="font-semibold">Why: </span>' + q.e + "</p>";
+    }
+    return out;
   }
 
   function questionHtml(item, i) {
     var q = item.q;
     var name = "q-" + q.id;
     var body = "";
+    var a = S.ans[q.id];
+    var practice = S.mode === "practice", instant = S.marking === "instant";
+    var revealed = !!S.shown[q.id], checked = instant && !!S.checked[q.id];
+    var locked = revealed || (checked && !practice);
+    var elim = S.hints[q.id] && !revealed ? elimPositions(item) : [];
+    function stateOf(isRight, picked, pos) {
+      if (revealed) return isRight ? "right" : picked ? "wrong" : "dim";
+      if (checked && picked) return isRight ? "right" : "wrong";
+      if (elim.indexOf(pos) >= 0) return "elim";
+      return "";
+    }
     if (q.t === "mcq") {
       body = item.order.map(function (orig, pos) {
-        return optionHtml(name, pos, LETTERS[pos], q.o[orig]);
+        return optionHtml(name, pos, LETTERS[pos], q.o[orig], stateOf(orig === q.a, pos === a, pos), pos === a, locked);
       }).join("");
       body = '<div class="grid gap-2" role="radiogroup" aria-labelledby="p-' + q.id + '">' + body + "</div>";
     } else if (q.t === "tf") {
       body =
         '<div class="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-labelledby="p-' + q.id + '">' +
-        optionHtml(name, "true", "T", "True") + optionHtml(name, "false", "F", "False") + "</div>";
+        optionHtml(name, "true", "T", "True", stateOf(q.a === true, a === true, 0), a === true, locked) +
+        optionHtml(name, "false", "F", "False", stateOf(q.a === false, a === false, 1), a === false, locked) + "</div>";
     } else {
+      var showCheck = instant && !revealed && !(checked && !practice);
       body =
         '<div class="flex flex-wrap items-center gap-3">' +
         '<label class="sr-only" for="n-' + q.id + '">Your numeric answer</label>' +
-        '<input id="n-' + q.id + '" data-num="' + q.id + '" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="Type a number" ' +
+        '<input id="n-' + q.id + '" data-num="' + q.id + '" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="Type a number"' +
+        (a !== undefined ? ' value="' + esc(a) + '"' : "") + (locked ? " disabled" : "") + ' ' +
         'class="focus-ring w-44 rounded-md border border-line bg-panel px-3 py-2 tabular-nums text-ink placeholder:text-mute/70 focus:border-accent">' +
         (q.u ? '<span class="text-mute">' + esc(q.u) + "</span>" : "") +
+        (showCheck ? '<button type="button" class="fb-btn fb-btn-primary" data-act="check" data-id="' + q.id + '">Check</button>' : "") +
         '<span class="text-sm text-mute">Round to a sensible number of digits.</span></div>';
     }
     return (
@@ -260,9 +359,22 @@
         '<span class="font-serif text-lg font-semibold tabular-nums">' + (i + 1) + ".</span>" + chips(q) + "</div>" +
       '<p id="p-' + q.id + '" class="mb-4 max-w-[68ch] font-serif text-lg leading-relaxed">' + q.q + "</p>" +
       body +
+      '<div data-fb="' + q.id + '" aria-live="polite">' + feedbackHtml(item) + "</div>" +
       '<p data-err="' + q.id + '" class="mt-2 hidden text-sm text-bad" role="alert"></p>' +
       "</article>"
     );
+  }
+
+  function itemById(id) { return S.items.filter(function (it) { return it.q.id === id; })[0]; }
+  function rerenderCard(id) {
+    var item = itemById(id), card = $("#card-" + id);
+    if (!item || !card) return;
+    var idx = S.items.indexOf(item);
+    var tmp = document.createElement("div");
+    tmp.innerHTML = questionHtml(item, idx);
+    card.replaceWith(tmp.firstChild);
+    var focus = $("#card-" + id + " input:checked") || $("#card-" + id + " [data-num]:not([disabled])");
+    if (focus && focus.focus) focus.focus({ preventScroll: true });
   }
 
   function renderQuiz() {
@@ -272,7 +384,7 @@
       '<div class="flex flex-wrap items-center gap-x-6 gap-y-2">' +
         '<div class="min-w-[12rem] flex-1">' +
           '<div class="mb-2 flex justify-between text-sm"><span><strong id="answered" class="tabular-nums">0</strong> of ' + total + ' answered</span>' +
-          '<span class="tabular-nums text-mute" id="timer" aria-label="Elapsed time">0:00</span></div>' +
+          '<span class="text-mute"><span class="mr-3">' + (S.mode === "practice" ? "\uD83D\uDCA1 Practice" : "\uD83D\uDCDD Exam") + " \u00B7 " + (S.marking === "instant" ? "instant" : "end") + ' marking</span><span class="tabular-nums" id="timer" aria-label="Elapsed time">0:00</span></span></div>' +
           '<div class="axis" role="progressbar" aria-label="Quiz progress" aria-valuemin="0" aria-valuemax="' + total + '" aria-valuenow="0" id="bar">' +
           '<div class="beam" id="beam" style="width:0%"></div></div>' +
         "</div>" +
@@ -352,6 +464,13 @@
     }
     clearMissing(id);
     updateProgress();
+    if (target.matches('input[type="radio"]')) {
+      if (S.marking === "instant") { S.checked[id] = true; rerenderCard(id); }
+    } else if (S.checked[id]) {
+      // the number was edited after being marked: drop the stale verdict
+      delete S.checked[id];
+      var fb = $('[data-fb="' + id + '"]'); if (fb) fb.innerHTML = feedbackHtml(itemById(id));
+    }
   }
 
   function trySubmit() {
@@ -512,7 +631,7 @@
           '<div><div class="axis" role="img" aria-label="Score ' + R.pct + ' percent"><div class="beam" style="width:' + R.pct + "%;--beam-full:" + (R.pct > 0 ? 10000 / R.pct : 100) + '%"></div></div></div>' +
           '<p class="text-xl font-medium">' + R.pct + "%. " + esc(verdict(R.pct)) + "</p>" +
           '<p class="text-sm text-mute">Time taken ' + fmtTime(R.elapsed) + ". " +
-            (R.isBest ? "New best score for this page." : best ? "Best on this page: " + best.score + " / " + best.total + " (" + best.pct + "%)." : "") + "</p>" +
+            (S.mode === "practice" ? "Practice mode \u00B7 " + Object.keys(S.hints).length + " hint(s) used \u00B7 " + Object.keys(S.shown).length + " answer(s) revealed. " : "") + (R.isBest ? "New best score for this page." : best ? "Best on this page: " + best.score + " / " + best.total + " (" + best.pct + "%)." : "") + "</p>" +
           (wrong.length ? '<p class="max-w-prose"><span class="font-medium">Slides to revisit:</span> ' + esc(revisit) + "</p>" : '<p class="font-medium text-ok">Every answer was correct.</p>') +
         "</div>" +
         '<div class="mt-8 flex flex-wrap gap-3 print:hidden">' +
@@ -578,6 +697,15 @@
     }
     else if (act === "new") { renderSetup(); window.scrollTo({ top: 0 }); }
     else if (act === "print") { window.print(); }
+    else if (act === "mode") { S.mode = btn.getAttribute("data-v"); savePrefs(); renderSetup(); }
+    else if (act === "marking") { S.marking = btn.getAttribute("data-v"); savePrefs(); renderSetup(); }
+    else if (act === "hint") { var hid = btn.getAttribute("data-id"); S.hints[hid] = true; rerenderCard(hid); }
+    else if (act === "reveal") { var rid = btn.getAttribute("data-id"); S.shown[rid] = true; rerenderCard(rid); }
+    else if (act === "check") {
+      var cid = btn.getAttribute("data-id");
+      if (!isAnswered(itemById(cid))) { toast("Enter a number first, for example 34.5 or -0.5."); return; }
+      S.checked[cid] = true; rerenderCard(cid);
+    }
     else if (act === "filter") { S.reviewFilter = btn.getAttribute("data-f"); applyReviewFilter(); }
   });
 
@@ -591,6 +719,8 @@
   root.addEventListener("keydown", function (e) {
     if (e.key === "Enter" && e.target.matches && e.target.matches("[data-num]")) {
       e.preventDefault();
+      var nid = e.target.getAttribute("data-num");
+      if (S.marking === "instant" && !S.checked[nid] && isAnswered(itemById(nid))) { S.checked[nid] = true; rerenderCard(nid); return; }
       var inputs = Array.prototype.slice.call(document.querySelectorAll("[data-num]"));
       var next = inputs[inputs.indexOf(e.target) + 1];
       if (next) next.focus();

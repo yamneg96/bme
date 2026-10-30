@@ -17,7 +17,7 @@ A React + Vite + shadcn/ui landing page that asks **"Which exam are you working 
 ├── public/
 │   ├── economics-quiz/     Economics exam (vanilla JS, one question per page, light/dark theme)
 │   └── optics-quiz/        Optics exam (vanilla JS + Tailwind CSS)
-├── .claude/                Local notes / source module text (git-ignored)
+├── .claude/                Local notes: module .md files (Economics text, Optics slides OCR) — git-ignored
 ├── components.json         shadcn/ui configuration
 └── vite.config.ts
 ```
@@ -44,6 +44,17 @@ Add more components with `npx shadcn@latest add <component>`.
 - Animated gradient/grid background and staggered card entrance; cards lift on hover and the page fades out as you open an exam.
 - Light / dark toggle (top right). Press `d` to toggle too — it follows the system theme by default.
 - To add an exam, add an entry to the `EXAMS` array in `src/App.tsx` and put its static files under `public/<name>/`.
+
+## Practice / exam modes (both exams)
+
+On each exam's setup screen there are two toggles:
+
+| Toggle | Options |
+| --- | --- |
+| **Mode** | **Exam** — no hints, no answers until you finish. **Practice** — a 💡 Hint button (rules out two wrong options, or points to the slide/chapter and gives the answer's magnitude for numeric questions) and, after a wrong answer, *Show answer & explanation*. |
+| **Marking** | **At the end** — everything is marked when you finish. **After each answer** — each answer is marked immediately (locked in exam mode; in practice mode you can change it). |
+
+Your last choice is remembered in the browser. Practice results show how many hints and reveals were used.
 
 ## Economics exam features
 

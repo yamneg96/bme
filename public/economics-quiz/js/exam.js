@@ -97,6 +97,12 @@
   /* ── state ── */
   let S = store.get();
   if (!S || S.v !== 2 || !Array.isArray(S.paper) || S.paper.some((p) => !BANK[p.id - 1])) S = null;
+  if (S) {
+    S.hints = S.hints || {};
+    S.shown = S.shown || {};
+    S.setup.mode = S.setup.mode || "exam";
+    S.setup.marking = S.setup.marking || "end";
+  }
   let timerHandle = null;
   let keyHandler = null;
 
@@ -127,7 +133,7 @@
   function startExam(setup) {
     const paper = buildPaper(setup);
     S = {
-      v: 2, phase: "exam", setup, paper, answers: {}, flags: {}, cur: 0,
+      v: 2, phase: "exam", setup, paper, answers: {}, flags: {}, hints: {}, shown: {}, cur: 0,
       limit: totalSeconds(setup.timing, paper.length) * 1000,
       start: Date.now(), end: null,
     };
@@ -156,6 +162,29 @@
     render();
     window.scrollTo({ top: 0 });
   }
+
+  /* ── practice / marking preferences ── */
+  const PREFS_KEY = "econ-exam-prefs-v1";
+  const getPrefs = () => Object.assign({ mode: "exam", marking: "end" }, load(PREFS_KEY));
+
+  /* A hint that nudges without giving the answer away: rule out two wrong options (MCQ) and point at the chapter. */
+  function hintFor(item) {
+    const { q, opts, correct } = view(item);
+    const where = `Review Chapter ${q.ch} · ${CH_NAMES[q.ch]}.`;
+    if (q.t === "tf") {
+      const abs = q.q.match(/(always|never|only|all|none|every|must|cannot)/i);
+      return (abs ? `Watch the absolute word “${abs[1]}”. ` : "Read the statement carefully for qualifiers. ") + where;
+    }
+    const wrong = opts.map((_, k) => k).filter((k) => k !== correct)
+      .sort((a, b) => ((a + 1) * 2654435761 + item.id * 40503) % 97 - ((b + 1) * 2654435761 + item.id * 40503) % 97)
+      .slice(0, 2).sort((a, b) => a - b);
+    return `It is not ${wrong.map((k) => LETTERS[k]).join(" or ")}. ${where}`;
+  }
+  const eliminated = (item) => {
+    if (!S.hints[item.id] || view(item).q.t === "tf") return [];
+    const m = hintFor(item).match(/^It is not ([A-E])(?: or ([A-E]))?\./);
+    return m ? [m[1], m[2]].filter(Boolean).map((l) => LETTERS.indexOf(l)) : [];
+  };
 
   /* ───────────── SETUP ───────────── */
   function renderSetup() {
@@ -209,6 +238,25 @@
             <label class="chk"><input id="shuf" type="checkbox" checked /> <span>Shuffle answer options</span></label>
           </div>
 
+          <div class="span2 grid2" style="gap:1rem">
+            <div>
+              <span class="label">Mode</span>
+              <div class="seg" role="radiogroup" aria-label="Mode">
+                <label><input type="radio" name="mode" value="exam" /><span>📝 Exam</span></label>
+                <label><input type="radio" name="mode" value="practice" /><span>💡 Practice</span></label>
+              </div>
+              <p id="mode-hint" class="hint"></p>
+            </div>
+            <div>
+              <span class="label">Marking</span>
+              <div class="seg" role="radiogroup" aria-label="Marking">
+                <label><input type="radio" name="marking" value="end" /><span>🏁 At the end</span></label>
+                <label><input type="radio" name="marking" value="instant" /><span>⚡ After each answer</span></label>
+              </div>
+              <p id="marking-hint" class="hint"></p>
+            </div>
+          </div>
+
           <div class="span2 row">
             <button type="submit" id="start-btn" class="btn btn-primary btn-lg">Start exam →</button>
             <span id="setup-msg" class="err" role="alert"></span>
@@ -248,9 +296,22 @@
       if (opts.some((o) => String(o.v) === prev)) countSel.value = prev;
       hint();
     };
-    form.addEventListener("change", refresh);
+    const prefs = getPrefs();
+    $(`input[name="mode"][value="${prefs.mode}"]`, form).checked = true;
+    $(`input[name="marking"][value="${prefs.marking}"]`, form).checked = true;
+    const picked = (n) => $(`input[name="${n}"]:checked`, form).value;
+    const explain = () => {
+      $("#mode-hint").textContent = picked("mode") === "practice"
+        ? "Hints and the correct answer with its explanation are available while you work."
+        : "Real exam conditions: no hints and no answers until you finish.";
+      $("#marking-hint").textContent = picked("marking") === "instant"
+        ? "Each answer is marked as soon as you give it."
+        : "Everything is marked together when you finish.";
+    };
+    form.addEventListener("change", () => { refresh(); explain(); });
     customMin.addEventListener("input", hint);
     refresh();
+    explain();
 
     form.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -262,7 +323,10 @@
         order: $("#order").value,
         shuffleOpts: $("#shuf").checked,
         timing: timingValue(),
+        mode: picked("mode"),
+        marking: picked("marking"),
       });
+      save(PREFS_KEY, { mode: picked("mode"), marking: picked("marking") });
     });
   }
 
@@ -357,26 +421,60 @@
     const N = S.paper.length;
     const i = S.cur;
     const item = S.paper[i];
-    const { q, opts } = view(item);
+    const { q, opts, correct } = view(item);
     const sel = S.answers[item.id];
     const flagged = !!S.flags[item.id];
+    const practice = S.setup.mode === "practice";
+    const instant = S.setup.marking === "instant";
+    const revealed = !!S.shown[item.id];
+    const checked = instant && sel !== undefined;
+    const locked = revealed || (checked && !practice);
+    const elim = eliminated(item);
+
     const options = opts
-      .map((o, k) => `<label class="opt ${sel === k ? "sel" : ""}">
-          <input class="sr-only" type="radio" name="q${item.id}" value="${k}" ${sel === k ? "checked" : ""} />
+      .map((o, k) => {
+        let cls = sel === k ? "sel" : "";
+        if (revealed) cls = k === correct ? "right" : sel === k ? "wrong" : "dim";
+        else if (checked && sel === k) cls = k === correct ? "right" : "wrong";
+        else if (elim.includes(k)) cls += " elim";
+        return `<label class="opt ${cls}${locked ? " locked" : ""}">
+          <input class="sr-only" type="radio" name="q${item.id}" value="${k}" ${sel === k ? "checked" : ""} ${locked ? "disabled" : ""} />
           <span class="key">${LETTERS[k]}</span><span class="grow">${esc(o)}</span>
-        </label>`)
+          ${elim.includes(k) && !revealed ? `<span class="tag tag-skip">ruled out</span>` : ""}
+        </label>`;
+      })
       .join("");
+
+    /* feedback: verdict (instant marking) + practice helpers */
+    let fb = "";
+    if (checked && !revealed) {
+      const ok = sel === correct;
+      fb += `<div class="fb ${ok ? "fb-ok" : "fb-bad"}"><b>${ok ? "✓ Correct" : "✗ Not quite"}</b>${
+        !practice ? " — answer locked; the full review comes when you finish." : ok ? "" : " — pick another answer, or use a hint."}</div>`;
+      if (practice && ok) fb += `<p class="explain"><b>Explanation:</b> ${esc(q.e)}</p>`;
+    }
+    if (practice && !revealed) {
+      if (S.hints[item.id]) fb += `<div class="fb fb-hint">💡 <b>Hint:</b> ${esc(hintFor(item))}</div>`;
+      const canReveal = !instant || (checked && sel !== correct);
+      fb += `<div class="row" style="margin-top:.7rem">${
+        S.hints[item.id] ? "" : `<button type="button" class="btn btn-ghost" data-hint>💡 Hint</button>`
+      }${canReveal ? `<button type="button" class="btn btn-ghost" data-reveal>👁 Show answer &amp; explanation</button>` : ""}</div>`;
+    }
+    if (revealed) {
+      fb += `<div class="fb fb-hint"><b>Answer: ${LETTERS[correct]}.</b> ${esc(opts[correct])}</div><p class="explain"><b>Explanation:</b> ${esc(q.e)}</p>`;
+    }
 
     const pane = $("#qpane");
     pane.innerHTML = `<div class="${animate ? "slide" : ""}">
       <div class="qhead">
         <span class="qnum">${i + 1}</span>
         <div class="grow">
-          <div class="qmeta"><span class="pill">Question ${i + 1} of ${N}</span><span class="pill">Ch ${q.ch} · ${esc(CH_NAMES[q.ch])}</span><span class="pill">${q.t === "tf" ? "True / False" : "Choose one"}</span></div>
+          <div class="qmeta"><span class="pill">Question ${i + 1} of ${N}</span><span class="pill">Ch ${q.ch} · ${esc(CH_NAMES[q.ch])}</span><span class="pill">${q.t === "tf" ? "True / False" : "Choose one"}</span><span class="pill">${practice ? "💡 Practice" : "📝 Exam"} · ${instant ? "instant" : "end"} marking</span></div>
           <p class="qtext" style="margin:.4rem 0 0">${esc(q.q)}</p>
         </div>
       </div>
       <div class="opts" role="radiogroup" aria-label="Answer options">${options}</div>
+      <div id="fb" aria-live="polite">${fb}</div>
       <div class="qfoot">
         <div class="grp">
           <button id="prev" class="btn btn-ghost" ${i === 0 ? "disabled" : ""}>← Previous</button>
@@ -391,6 +489,15 @@
     $(".opts", pane).addEventListener("change", (e) => {
       const input = e.target.closest('input[type="radio"]');
       if (input) selectOption(+input.value);
+    });
+    $("#fb", pane).addEventListener("click", (e) => {
+      const hintBtn = e.target.closest("[data-hint]");
+      const revealBtn = e.target.closest("[data-reveal]");
+      if (!hintBtn && !revealBtn) return;
+      if (hintBtn) S.hints[item.id] = 1;
+      if (revealBtn) S.shown[item.id] = 1;
+      store.set(S);
+      showQuestion(false);
     });
     $("#prev").addEventListener("click", () => goTo(S.cur - 1));
     $("#flag").addEventListener("click", toggleFlag);
@@ -410,9 +517,11 @@
   function selectOption(k) {
     const item = S.paper[S.cur];
     const opts = view(item).opts;
-    if (k >= opts.length) return;
+    if (k >= opts.length || S.shown[item.id]) return;
+    if (S.setup.marking === "instant" && S.setup.mode !== "practice" && S.answers[item.id] !== undefined) return; // locked once marked
     S.answers[item.id] = k;
     store.set(S);
+    if (S.setup.marking === "instant") { showQuestion(false); return; }
     $$(".opt", $("#qpane")).forEach((o, idx) => {
       o.classList.toggle("sel", idx === k);
       $("input", o).checked = idx === k;
@@ -563,6 +672,7 @@
             </dl>
           </div>
         </div>
+        ${S.setup.mode === "practice" ? `<p class="sm muted" style="margin:1rem 0 0">Practice mode · ${Object.keys(S.hints).length} hint${Object.keys(S.hints).length === 1 ? "" : "s"} used · ${Object.keys(S.shown).length} answer${Object.keys(S.shown).length === 1 ? "" : "s"} revealed.</p>` : ""}
         <div class="row no-print" style="margin-top:1.4rem">
           <button id="retake" class="btn btn-primary">↻ Retake (new shuffle)</button>
           <button id="newsetup" class="btn btn-ghost">Change settings</button>

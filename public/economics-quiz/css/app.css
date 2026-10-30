@@ -154,6 +154,21 @@ label.opt:hover { border-color: var(--brand); background: var(--brand-soft); }
 aside .card { position: sticky; top: 9.5rem; }
 kbd { padding: 0 .35rem; border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 5px; background: var(--surface-2); font: .72rem ui-monospace, monospace; }
 
+/* mode toggles + practice feedback */
+.seg { display: inline-flex; padding: 3px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2); }
+.seg label { cursor: pointer; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg span { display: block; padding: .45rem .9rem; border-radius: 9px; font-size: .85rem; font-weight: 650; color: var(--muted); transition: background .15s, color .15s; }
+.seg input:checked + span { background: linear-gradient(135deg, var(--brand), var(--brand-2)); color: var(--on-brand); box-shadow: 0 2px 8px color-mix(in srgb, var(--brand) 30%, transparent); }
+.seg input:focus-visible + span { outline: 2px solid var(--brand); outline-offset: 2px; }
+.fb { margin-top: .9rem; padding: .65rem .9rem; border-radius: 12px; font-size: .9rem; animation: slide .2s ease; }
+.fb-ok { background: var(--ok-soft); color: var(--ok); } .fb-bad { background: var(--bad-soft); color: var(--bad); }
+.fb-hint { background: var(--warn-soft); color: var(--text); border: 1px solid var(--warn); }
+.opt.elim { opacity: .5; text-decoration: line-through; }
+label.opt.locked { cursor: default; }
+label.opt.locked:hover { border-color: var(--border); background: var(--surface); }
+label.opt.right.locked:hover, label.opt.right:hover { border-color: var(--ok); background: var(--ok-soft); }
+
 /* result */
 .ringwrap { position: relative; width: 9.5rem; height: 9.5rem; flex: none; }
 .ringwrap svg { width: 100%; height: 100%; transform: rotate(-90deg); }
