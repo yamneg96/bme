@@ -135,7 +135,7 @@ window.QB = [
 "tol": 1.192e-09,
 "u": "",
 "tolPct": 1,
-"e": "ε = 2⁻²³ = 1.192×10^-7 ≈ 1.19×10⁻⁷, consistent with about 7 significant decimal digits.\n(Double precision has 52 stored bits: ε = 2⁻⁵² = 2.22×10^-16, about 16 digits.)"
+"e": "ε = 2⁻²³ = 1.192×10^−7 ≈ 1.19×10⁻⁷, consistent with about 7 significant decimal digits.\n(Double precision has 52 stored bits: ε = 2⁻⁵² = 2.22×10^−16, about 16 digits.)"
 },
 {
 "ch": 2,
@@ -204,7 +204,7 @@ window.QB = [
 "tol": 0.0004025,
 "u": "%",
 "tolPct": 1,
-"e": "E = true − approximate = π − 22/7 = -0.00126449 (negative: the approximation overestimates).\nε_t = E/true × 100 % = -0.04025 %  → magnitude 0.04025 %."
+"e": "E = true − approximate = π − 22/7 = −0.00126449 (negative: the approximation overestimates).\nε_t = E/true × 100 % = −0.04025 %  → magnitude 0.04025 %."
 },
 {
 "ch": 3,
@@ -233,7 +233,7 @@ window.QB = [
 "tol": 4.041e-07,
 "u": "",
 "tolPct": 2,
-"e": "Approximation: 0.3 − 0.3³/6 = 0.3 − 0.0045 = 0.2955.\nTrue sin(0.3) = 0.295520207.\nTruncation error = 2.021×10^-5 (the first neglected term x⁵/5! = 2.025×10^-5)."
+"e": "Approximation: 0.3 − 0.3³/6 = 0.3 − 0.0045 = 0.2955.\nTrue sin(0.3) = 0.295520207.\nTruncation error = 2.021×10^−5 (the first neglected term x⁵/5! = 2.025×10^−5)."
 },
 {
 "ch": 3,
@@ -243,7 +243,7 @@ window.QB = [
 "tol": 3.333e-07,
 "u": "",
 "tolPct": 1,
-"e": "1/3 = 0.333333… ⇒ stored 0.3333; error = 0.0000333… = 3.333×10^-5.\nRelative error = 0.01 %."
+"e": "1/3 = 0.333333… ⇒ stored 0.3333; error = 0.0000333… = 3.333×10^−5.\nRelative error = 0.01 %."
 },
 {
 "ch": 3,
@@ -381,7 +381,7 @@ window.QB = [
 "tol": 0.01201,
 "u": "",
 "tolPct": 0.1,
-"e": "f(2.1) = 9.261, f(1.9) = 6.859 ⇒ (9.261 − 6.859)/0.2 = 12.01.\nThe error is only 0.01 (∝ h², so much better than the forward/backward errors of 0.61 and -0.59)."
+"e": "f(2.1) = 9.261, f(1.9) = 6.859 ⇒ (9.261 − 6.859)/0.2 = 12.01.\nThe error is only 0.01 (∝ h², so much better than the forward/backward errors of 0.61 and −0.59)."
 },
 {
 "ch": 4,
@@ -443,7 +443,7 @@ window.QB = [
 "tol": 0.001375,
 "u": "",
 "tolPct": 0.1,
-"e": "Iter 1: x_r = 1.5, f(1.5) = 0.25 > 0 same sign as f(2) ⇒ root in [1, 1.5].\nIter 2: x_r = 1.25, f = −0.4375 < 0 ⇒ root in [1.25, 1.5].\nIter 3: x_r = 1.375, f = -0.1094 < 0 ⇒ root in [1.375, 1.5].\n(Iter 4: 1.438; √2 = 1.41421.)"
+"e": "Iter 1: x_r = 1.5, f(1.5) = 0.25 > 0 same sign as f(2) ⇒ root in [1, 1.5].\nIter 2: x_r = 1.25, f = −0.4375 < 0 ⇒ root in [1.25, 1.5].\nIter 3: x_r = 1.375, f = −0.1094 < 0 ⇒ root in [1.375, 1.5].\n(Iter 4: 1.438; √2 = 1.41421.)"
 },
 {
 "ch": 5,

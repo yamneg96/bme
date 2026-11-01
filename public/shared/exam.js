@@ -329,6 +329,21 @@
     const prefs = getPrefs();
     $(`input[name="mode"][value="${prefs.mode}"]`, form).checked = true;
     $(`input[name="marking"][value="${prefs.marking}"]`, form).checked = true;
+    /* deep links from the revision pages: ?ch=4,5  &mode=practice  &marking=instant */
+    const qp = new URLSearchParams(location.search);
+    const only = (qp.get("ch") || "").split(",").map(Number).filter((n) => cfg.chapters.includes(n));
+    if (only.length) $$('input[name="chap"]', form).forEach((i) => { i.checked = only.includes(+i.value); });
+    ["mode", "marking"].forEach((n) => {
+      const r = qp.get(n) && $(`input[name="${n}"][value="${qp.get(n)}"]`, form);
+      if (r) r.checked = true;
+    });
+    if (only.length) {
+      const note = document.createElement("p");
+      note.className = "callout";
+      note.style.marginBottom = "1rem";
+      note.textContent = `Worksheet for ${UNIT} ${only.join(", ")} — ${only.map((c) => CH_NAMES[c]).join(" · ")}. Change the selection below if you like.`;
+      form.parentNode.insertBefore(note, form);
+    }
     const picked = (n) => $(`input[name="${n}"]:checked`, form).value;
     const explain = () => {
       $("#mode-hint").textContent = picked("mode") === "practice"
