@@ -198,3 +198,9 @@ footer { padding: 1.5rem 1rem; border-top: 1px solid var(--border); text-align: 
   .card, .tile { box-shadow: none; break-inside: avoid; }
 }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* workout (numeric) questions + multi-line text */
+.numrow { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
+.num-in { max-width: 16rem; font: 600 1.1rem ui-monospace, Menlo, Consolas, monospace; padding: .7rem .9rem; }
+.unit { font-weight: 650; color: var(--muted); }
+.qtext, .explain, .fb { white-space: pre-line; }

@@ -7,8 +7,8 @@
   <meta name="description" content="Practice exam for the Introduction to Economics module, one question per page, with instant marking and full explanations." />
   <meta name="theme-color" content="#1f5566" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231f5566'/%3E%3Cpath d='M22 72V50m22 22V34m22 38V24' stroke='white' stroke-width='10' stroke-linecap='round'/%3E%3C/svg%3E" />
-  <script>try{var t=localStorage.getItem("econ-theme");if(t)document.documentElement.dataset.theme=t;else if(matchMedia("(prefers-color-scheme: dark)").matches)document.documentElement.dataset.theme="dark"}catch(e){}</script>
-  <link rel="stylesheet" href="css/app.css" />
+  <script>try{var t=localStorage.getItem("exam-theme");if(t)document.documentElement.dataset.theme=t;else if(matchMedia("(prefers-color-scheme: dark)").matches)document.documentElement.dataset.theme="dark"}catch(e){}</script>
+  <link rel="stylesheet" href="../shared/app.css" />
 </head>
 <body>
   <header class="topbar">
@@ -43,9 +43,9 @@
     Questions are based on the <i>Introduction to Economics</i> module (September 2019). Progress and stats are saved in your browser only.
   </footer>
 
-  <script>window.EXAM = { key: "all", chapters: [1, 2, 3, 4, 5, 6] };</script>
+  <script>window.EXAM = { key: "all", chapters: [1, 2, 3, 4, 5, 6], unit: "Chapter", prefix: "econ", names: { 1: "Basics of Economics", 2: "Theory of Demand and Supply", 3: "Theory of Consumer Behaviour", 4: "Theory of Production and Cost", 5: "Market Structure", 6: "Fundamental Concepts of Macroeconomics" } };</script>
   <script defer src="js/q-part1.js"></script>
   <script defer src="js/q-part2.js"></script>
-  <script defer src="js/exam.js"></script>
+  <script defer src="../shared/exam.js"></script>
 </body>
 </html>

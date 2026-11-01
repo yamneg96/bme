@@ -1,22 +1,19 @@
-/* Exam engine — setup → exam (one question per page) → marked result. Answers are embedded in js/q-part*.js. */
+/* Shared exam engine — setup → exam (one question per page) → marked result.
+   Config comes from window.EXAM = { key, chapters, names, unit?, prefix?, defaultPerQ? } and the question bank from window.QB.
+   Question types: "mc" (o = options, first option is correct), "tf" (a = true/false), "num" (a = number, tol = ± allowed error, u = unit). */
 (function () {
   "use strict";
 
   const cfg = window.EXAM;
-  const CH_NAMES = {
-    1: "Basics of Economics",
-    2: "Theory of Demand and Supply",
-    3: "Theory of Consumer Behaviour",
-    4: "Theory of Production and Cost",
-    5: "Market Structure",
-    6: "Fundamental Concepts of Macroeconomics",
-  };
+  const CH_NAMES = cfg.names || {};
+  const UNIT = cfg.unit || "Chapter";
+  const P = cfg.prefix || "econ";
   const BANK = (window.QB || []).map((q, i) => Object.assign({ id: i + 1 }, q));
-  const KEY = "econ-exam-v2-" + cfg.key;
-  const STATS_KEY = "econ-exam-stats-v1";
-  const THEME_KEY = "econ-theme";
+  const KEY = P + "-exam-v2-" + cfg.key;
+  const STATS_KEY = P + "-exam-stats-v1";
+  const THEME_KEY = "exam-theme";
   const LETTERS = ["A", "B", "C", "D", "E"];
-  const DEFAULT_SECS_PER_Q = 90; // 1:30 per question unless the user changes it
+  const DEFAULT_SECS_PER_Q = cfg.defaultPerQ || 90; // total time = questions x this, unless the user changes it
 
   /* ── helpers ── */
   const $ = (s, r) => (r || document).querySelector(s);
@@ -37,6 +34,16 @@
     get: () => load(KEY),
     set: (v) => save(KEY, v),
     del() { try { localStorage.removeItem(KEY); } catch (e) { /* ignore */ } },
+  };
+  const parseNum = (s) => {
+    s = String(s).trim().replace(/,/g, "").replace(/[−–]/g, "-").replace(/×\s*10\^?/i, "e").replace(/\s+/g, "");
+    return /^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(s) ? parseFloat(s) : NaN;
+  };
+  const fmtNum = (n) => {
+    if (n === 0) return "0";
+    const a = Math.abs(n);
+    if (a >= 1e5 || a < 1e-3) { const [m, e] = n.toExponential(3).split("e"); return m.replace(/\.?0+$/, "") + "×10^" + (+e); }
+    return String(+n.toPrecision(5));
   };
   const fmtTime = (ms) => {
     const s = Math.max(0, Math.round(ms / 1000));
@@ -100,6 +107,7 @@
   if (S) {
     S.hints = S.hints || {};
     S.shown = S.shown || {};
+    S.checked = S.checked || {};
     S.setup.mode = S.setup.mode || "exam";
     S.setup.marking = S.setup.marking || "end";
   }
@@ -111,19 +119,30 @@
 
   const view = (item) => {
     const q = BANK[item.id - 1];
+    if (q.t === "num") return { q, opts: [], correct: null };
     const opts = q.t === "tf" ? ["True", "False"] : item.perm.map((i) => q.o[i]);
     const correct = q.t === "tf" ? (q.a ? 0 : 1) : item.perm.indexOf(0);
     return { q, opts, correct };
   };
+
+  /* true when the stored answer for this paper item is right (any question type) */
+  const isRight = (item) => {
+    const { q, correct } = view(item);
+    const a = S.answers[item.id];
+    if (a === undefined) return false;
+    if (q.t === "num") { const v = parseNum(a); return !isNaN(v) && Math.abs(v - q.a) <= (q.tol || 0) + 1e-12; }
+    return a === correct;
+  };
+  const numAnswerText = (q) => `${fmtNum(q.a)}${q.u ? " " + q.u : ""}`;
 
   function buildPaper(setup) {
     let pool = poolFor(setup.chapters);
     if (setup.count && setup.count < pool.length) pool = shuffle(pool).slice(0, setup.count);
     pool = setup.order === "random" ? shuffle(pool) : pool.slice().sort((a, b) => a.id - b.id);
     return pool.map((q) => {
-      const n = q.t === "tf" ? 2 : q.o.length;
+      const n = q.t === "num" ? 0 : q.t === "tf" ? 2 : q.o.length;
       const idx = Array.from({ length: n }, (_, i) => i);
-      return { id: q.id, perm: q.t === "tf" || !setup.shuffleOpts ? idx : shuffle(idx) };
+      return { id: q.id, perm: q.t === "tf" || q.t === "num" || !setup.shuffleOpts ? idx : shuffle(idx) };
     });
   }
 
@@ -133,7 +152,7 @@
   function startExam(setup) {
     const paper = buildPaper(setup);
     S = {
-      v: 2, phase: "exam", setup, paper, answers: {}, flags: {}, hints: {}, shown: {}, cur: 0,
+      v: 2, phase: "exam", setup, paper, answers: {}, flags: {}, hints: {}, shown: {}, checked: {}, cur: 0,
       limit: totalSeconds(setup.timing, paper.length) * 1000,
       start: Date.now(), end: null,
     };
@@ -149,7 +168,7 @@
     S.end = Math.min(Date.now(), S.limit ? S.start + S.limit : Infinity);
     store.set(S);
     clearInterval(timerHandle);
-    const score = S.paper.filter((p) => view(p).correct === S.answers[p.id]).length;
+    const score = S.paper.filter(isRight).length;
     recordFinish(score, S.paper.length);
     render();
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -164,13 +183,19 @@
   }
 
   /* ── practice / marking preferences ── */
-  const PREFS_KEY = "econ-exam-prefs-v1";
+  const PREFS_KEY = P + "-exam-prefs-v1";
   const getPrefs = () => Object.assign({ mode: "exam", marking: "end" }, load(PREFS_KEY));
 
   /* A hint that nudges without giving the answer away: rule out two wrong options (MCQ) and point at the chapter. */
   function hintFor(item) {
     const { q, opts, correct } = view(item);
-    const where = `Review Chapter ${q.ch} · ${CH_NAMES[q.ch]}.`;
+    const where = `Review ${UNIT} ${q.ch} · ${CH_NAMES[q.ch]}.`;
+    if (q.t === "num") {
+      const v = q.a;
+      if (v === 0) return "The answer is zero or very close to it. " + where;
+      const k = Math.floor(Math.log10(Math.abs(v)));
+      return `The answer is ${v < 0 ? "negative" : "positive"}, between ${fmtNum(Math.pow(10, k))} and ${fmtNum(Math.pow(10, k + 1))}${q.u ? " " + q.u : ""}. ${where}`;
+    }
     if (q.t === "tf") {
       const abs = q.q.match(/(always|never|only|all|none|every|must|cannot)/i);
       return (abs ? `Watch the absolute word “${abs[1]}”. ` : "Read the statement carefully for qualifiers. ") + where;
@@ -181,7 +206,7 @@
     return `It is not ${wrong.map((k) => LETTERS[k]).join(" or ")}. ${where}`;
   }
   const eliminated = (item) => {
-    if (!S.hints[item.id] || view(item).q.t === "tf") return [];
+    if (!S.hints[item.id] || view(item).q.t === "tf" || view(item).q.t === "num") return [];
     const m = hintFor(item).match(/^It is not ([A-E])(?: or ([A-E]))?\./);
     return m ? [m[1], m[2]].filter(Boolean).map((l) => LETTERS.indexOf(l)) : [];
   };
@@ -191,7 +216,7 @@
     const chapterRows = cfg.chapters
       .map((c) => `<label class="chk">
           <input type="checkbox" name="chap" value="${c}" checked />
-          <span class="grow"><b>Chapter ${c}</b> · ${esc(CH_NAMES[c])}</span>
+          <span class="grow"><b>${UNIT} ${c}</b> · ${esc(CH_NAMES[c])}</span>
           <span class="xs muted">${poolFor([c]).length} Qs</span>
         </label>`)
       .join("");
@@ -199,11 +224,11 @@
     app.innerHTML = `
       <section class="card pad" aria-labelledby="setup-h">
         <h2 id="setup-h" class="title">Set up your exam</h2>
-        <p class="muted sm" style="margin:.3rem 0 0">Questions appear one at a time. Press <b>Finish &amp; get my mark</b> at the end to see your score, a chapter breakdown, and the correct answer with an explanation for every question.</p>
+        <p class="muted sm" style="margin:.3rem 0 0">Questions appear one at a time. Press <b>Finish &amp; get my mark</b> at the end to see your score, a ${UNIT.toLowerCase()} breakdown, and the correct answer with an explanation for every question.</p>
 
         <form id="setup-form" class="grid2" style="margin-top:1.4rem">
           <fieldset>
-            <legend class="label">Chapters to include</legend>
+            <legend class="label">${UNIT}s to include</legend>
             ${chapterRows}
             <p id="avail" class="sm muted" style="margin:.4rem 0 0"></p>
           </fieldset>
@@ -216,16 +241,19 @@
             <div>
               <label class="label" for="order">Question order</label>
               <select id="order" class="field">
-                <option value="chapter">By chapter (as in the module)</option>
+                <option value="chapter">By ${UNIT.toLowerCase()} (as in the course)</option>
                 <option value="random">Random mix</option>
               </select>
             </div>
             <div>
               <label class="label" for="timing">Timer</label>
               <select id="timing" class="field">
-                <option value="90" selected>1:30 per question (default)</option>
-                <option value="60">1:00 per question</option>
-                <option value="120">2:00 per question</option>
+                ${[60, 90, 120, 180, 300, 420]
+                  .concat(DEFAULT_SECS_PER_Q)
+                  .filter((v, i, a) => a.indexOf(v) === i)
+                  .sort((x, y) => x - y)
+                  .map((v) => `<option value="${v}" ${v === DEFAULT_SECS_PER_Q ? "selected" : ""}>${fmtTime(v * 1000).replace(/^0/, "")} per question${v === DEFAULT_SECS_PER_Q ? " (default)" : ""}</option>`)
+                  .join("")}
                 <option value="custom">Custom total time…</option>
                 <option value="none">No time limit</option>
               </select>
@@ -235,7 +263,7 @@
               </div>
               <p id="time-hint" class="hint"></p>
             </div>
-            <label class="chk"><input id="shuf" type="checkbox" checked /> <span>Shuffle answer options</span></label>
+            <label class="chk"><input id="shuf" type="checkbox" checked /> <span>Shuffle answer options (multiple choice)</span></label>
           </div>
 
           <div class="span2 grid2" style="gap:1rem">
@@ -427,9 +455,11 @@
     const practice = S.setup.mode === "practice";
     const instant = S.setup.marking === "instant";
     const revealed = !!S.shown[item.id];
-    const checked = instant && sel !== undefined;
+    const isNum = q.t === "num";
+    const checked = instant && (isNum ? !!S.checked[item.id] && sel !== undefined : sel !== undefined);
     const locked = revealed || (checked && !practice);
     const elim = eliminated(item);
+    const okNow = isNum ? isRight(item) : sel === correct;
 
     const options = opts
       .map((o, k) => {
@@ -445,23 +475,35 @@
       })
       .join("");
 
+    /* number entry for workout questions */
+    const numBox = isNum
+      ? `<div class="numrow">
+          <label class="sr-only" for="numin">Your answer</label>
+          <input id="numin" class="field num-in" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="Type your answer" value="${sel === undefined ? "" : esc(sel)}" ${locked ? "disabled" : ""} />
+          ${q.u ? `<span class="unit">${esc(q.u)}</span>` : ""}
+          ${instant && !locked && !revealed ? `<button type="button" class="btn btn-primary" data-check>Check</button>` : ""}
+        </div>
+        <p class="hint">Round sensibly — answers within about ${q.tolPct ? q.tolPct + "%" : "±" + fmtNum(q.tol || 0)} are accepted. You can write 3.2e-5 or 3.2×10^-5.</p>`
+      : "";
+    if (isNum && revealed) { /* the box is shown disabled above */ }
+
     /* feedback: verdict (instant marking) + practice helpers */
     let fb = "";
     if (checked && !revealed) {
-      const ok = sel === correct;
+      const ok = okNow;
       fb += `<div class="fb ${ok ? "fb-ok" : "fb-bad"}"><b>${ok ? "✓ Correct" : "✗ Not quite"}</b>${
         !practice ? " — answer locked; the full review comes when you finish." : ok ? "" : " — pick another answer, or use a hint."}</div>`;
       if (practice && ok) fb += `<p class="explain"><b>Explanation:</b> ${esc(q.e)}</p>`;
     }
     if (practice && !revealed) {
       if (S.hints[item.id]) fb += `<div class="fb fb-hint">💡 <b>Hint:</b> ${esc(hintFor(item))}</div>`;
-      const canReveal = !instant || (checked && sel !== correct);
+      const canReveal = !instant || (checked && !okNow);
       fb += `<div class="row" style="margin-top:.7rem">${
         S.hints[item.id] ? "" : `<button type="button" class="btn btn-ghost" data-hint>💡 Hint</button>`
       }${canReveal ? `<button type="button" class="btn btn-ghost" data-reveal>👁 Show answer &amp; explanation</button>` : ""}</div>`;
     }
     if (revealed) {
-      fb += `<div class="fb fb-hint"><b>Answer: ${LETTERS[correct]}.</b> ${esc(opts[correct])}</div><p class="explain"><b>Explanation:</b> ${esc(q.e)}</p>`;
+      fb += `<div class="fb fb-hint"><b>Answer: ${isNum ? esc(numAnswerText(q)) : LETTERS[correct] + "."}</b> ${isNum ? "" : esc(opts[correct])}</div><p class="explain"><b>Explanation:</b> ${esc(q.e)}</p>`;
     }
 
     const pane = $("#qpane");
@@ -469,11 +511,11 @@
       <div class="qhead">
         <span class="qnum">${i + 1}</span>
         <div class="grow">
-          <div class="qmeta"><span class="pill">Question ${i + 1} of ${N}</span><span class="pill">Ch ${q.ch} · ${esc(CH_NAMES[q.ch])}</span><span class="pill">${q.t === "tf" ? "True / False" : "Choose one"}</span><span class="pill">${practice ? "💡 Practice" : "📝 Exam"} · ${instant ? "instant" : "end"} marking</span></div>
+          <div class="qmeta"><span class="pill">Question ${i + 1} of ${N}</span><span class="pill">${UNIT === "Chapter" ? "Ch" : UNIT} ${q.ch} · ${esc(CH_NAMES[q.ch])}</span><span class="pill">${isNum ? "🧮 Workout — type the answer" : q.t === "tf" ? "True / False" : "Choose one"}</span><span class="pill">${practice ? "💡 Practice" : "📝 Exam"} · ${instant ? "instant" : "end"} marking</span></div>
           <p class="qtext" style="margin:.4rem 0 0">${esc(q.q)}</p>
         </div>
       </div>
-      <div class="opts" role="radiogroup" aria-label="Answer options">${options}</div>
+      ${isNum ? numBox : `<div class="opts" role="radiogroup" aria-label="Answer options">${options}</div>`}
       <div id="fb" aria-live="polite">${fb}</div>
       <div class="qfoot">
         <div class="grp">
@@ -486,10 +528,19 @@
       </div>
     </div>`;
 
-    $(".opts", pane).addEventListener("change", (e) => {
-      const input = e.target.closest('input[type="radio"]');
-      if (input) selectOption(+input.value);
-    });
+    if (isNum) {
+      const inp = $("#numin", pane);
+      inp.addEventListener("input", () => setNum(inp.value));
+      inp.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); checkNum(); } });
+      const cb = $("[data-check]", pane);
+      if (cb) cb.addEventListener("click", checkNum);
+      if (!locked) inp.focus({ preventScroll: true });
+    } else {
+      $(".opts", pane).addEventListener("change", (e) => {
+        const input = e.target.closest('input[type="radio"]');
+        if (input) selectOption(+input.value);
+      });
+    }
     $("#fb", pane).addEventListener("click", (e) => {
       const hintBtn = e.target.closest("[data-hint]");
       const revealBtn = e.target.closest("[data-reveal]");
@@ -527,6 +578,27 @@
       $("input", o).checked = idx === k;
     });
     updateProgress();
+  }
+
+  /* numeric answers: stored only while they parse; a verdict is dropped when the value changes */
+  function setNum(raw) {
+    const item = S.paper[S.cur];
+    if (S.shown[item.id]) return;
+    if (isNaN(parseNum(raw))) delete S.answers[item.id]; else S.answers[item.id] = raw;
+    if (S.checked[item.id]) {
+      delete S.checked[item.id];
+      const fb = $("#fb");
+      if (fb) fb.innerHTML = "";
+    }
+    store.set(S);
+    updateProgress();
+  }
+  function checkNum() {
+    const item = S.paper[S.cur];
+    if (S.setup.marking !== "instant" || S.answers[item.id] === undefined) return;
+    S.checked[item.id] = true;
+    store.set(S);
+    showQuestion(false);
   }
 
   function toggleFlag() {
@@ -596,7 +668,7 @@
     const rows = S.paper.map((item, i) => {
       const v = view(item);
       const chosen = S.answers[item.id];
-      const ok = chosen === v.correct;
+      const ok = isRight(item);
       const status = chosen === undefined ? "skip" : ok ? "ok" : "bad";
       if (ok) score++;
       const c = (byCh[v.q.ch] = byCh[v.q.ch] || { n: 0, ok: 0 });
@@ -617,7 +689,7 @@
         const p = Math.round((ok / n) * 100);
         const color = p >= 75 ? "var(--ok)" : p >= 50 ? "var(--warn)" : "var(--bad)";
         return `<div>
-          <div class="row sm" style="justify-content:space-between"><span><b>Ch ${ch}</b> · ${esc(CH_NAMES[ch])}</span><span>${ok}/${n} · ${p}%</span></div>
+          <div class="row sm" style="justify-content:space-between"><span><b>${UNIT === "Chapter" ? "Ch" : UNIT} ${ch}</b> · ${esc(CH_NAMES[ch])}</span><span>${ok}/${n} · ${p}%</span></div>
           <div class="bar"><div style="width:${p}%;background:${color}"></div></div>
         </div>`;
       })
@@ -626,7 +698,10 @@
     const review = rows
       .map((r) => {
         const { q, opts, correct } = r.v;
-        const optHtml = opts
+        const optHtml = q.t === "num"
+          ? `<div class="opt ${r.status === "ok" ? "right" : r.status === "bad" ? "wrong" : "dim"}"><span class="key">=</span><span class="grow">Your answer: <b>${r.chosen === undefined ? "—" : esc(r.chosen) + (q.u ? " " + esc(q.u) : "")}</b></span></div>
+             <div class="opt right"><span class="key">✓</span><span class="grow">Correct answer: <b>${esc(numAnswerText(q))}</b></span><span class="tag tag-ok">±${fmtNum(q.tol || 0)} accepted</span></div>`
+          : opts
           .map((o, k) => {
             const isCorrect = k === correct, isChosen = k === r.chosen;
             const cls = isCorrect ? "opt right" : isChosen ? "opt wrong" : "opt dim";
@@ -639,7 +714,7 @@
           <header class="qhead">
             <span class="qnum ${r.status === "ok" ? "qnum-ok" : r.status === "bad" ? "qnum-bad" : ""}">${r.i + 1}</span>
             <div class="grow"><p style="margin:0;font-weight:550">${esc(q.q)}</p>
-              <p class="xs muted" style="margin:.25rem 0 0">Chapter ${q.ch}</p></div>${badge}
+              <p class="xs muted" style="margin:.25rem 0 0">${UNIT} ${q.ch} · ${esc(CH_NAMES[q.ch])}</p></div>${badge}
           </header>
           <div class="opts">${optHtml}</div>
           <p class="explain"><b>Explanation:</b> ${esc(q.e)}</p>
