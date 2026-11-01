@@ -20,6 +20,8 @@
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   const esc = (s) =>
     String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  /* escape, then render x_y style subscripts (Unicode has no subscript y or z) as real <sub> text */
+  const rt = (s) => esc(s).replace(/ₓ/g, "<sub>x</sub>").replace(/([^\s_])_([A-Za-z0-9ρφθλεμπ]+)/g, "$1<sub>$2</sub>");
   const shuffle = (a) => {
     a = a.slice();
     for (let i = a.length - 1; i > 0; i--) {
@@ -469,7 +471,7 @@
         else if (elim.includes(k)) cls += " elim";
         return `<label class="opt ${cls}${locked ? " locked" : ""}">
           <input class="sr-only" type="radio" name="q${item.id}" value="${k}" ${sel === k ? "checked" : ""} ${locked ? "disabled" : ""} />
-          <span class="key">${LETTERS[k]}</span><span class="grow">${esc(o)}</span>
+          <span class="key">${LETTERS[k]}</span><span class="grow">${rt(o)}</span>
           ${elim.includes(k) && !revealed ? `<span class="tag tag-skip">ruled out</span>` : ""}
         </label>`;
       })
@@ -493,7 +495,7 @@
       const ok = okNow;
       fb += `<div class="fb ${ok ? "fb-ok" : "fb-bad"}"><b>${ok ? "✓ Correct" : "✗ Not quite"}</b>${
         !practice ? " — answer locked; the full review comes when you finish." : ok ? "" : " — pick another answer, or use a hint."}</div>`;
-      if (practice && ok) fb += `<p class="explain"><b>Explanation:</b> ${esc(q.e)}</p>`;
+      if (practice && ok) fb += `<p class="explain"><b>Explanation:</b> ${rt(q.e)}</p>`;
     }
     if (practice && !revealed) {
       if (S.hints[item.id]) fb += `<div class="fb fb-hint">💡 <b>Hint:</b> ${esc(hintFor(item))}</div>`;
@@ -503,7 +505,7 @@
       }${canReveal ? `<button type="button" class="btn btn-ghost" data-reveal>👁 Show answer &amp; explanation</button>` : ""}</div>`;
     }
     if (revealed) {
-      fb += `<div class="fb fb-hint"><b>Answer: ${isNum ? esc(numAnswerText(q)) : LETTERS[correct] + "."}</b> ${isNum ? "" : esc(opts[correct])}</div><p class="explain"><b>Explanation:</b> ${esc(q.e)}</p>`;
+      fb += `<div class="fb fb-hint"><b>Answer: ${isNum ? esc(numAnswerText(q)) : LETTERS[correct] + "."}</b> ${isNum ? "" : rt(opts[correct])}</div><p class="explain"><b>Explanation:</b> ${rt(q.e)}</p>`;
     }
 
     const pane = $("#qpane");
@@ -512,7 +514,7 @@
         <span class="qnum">${i + 1}</span>
         <div class="grow">
           <div class="qmeta"><span class="pill">Question ${i + 1} of ${N}</span><span class="pill">${UNIT === "Chapter" ? "Ch" : UNIT} ${q.ch} · ${esc(CH_NAMES[q.ch])}</span><span class="pill">${isNum ? "🧮 Workout — type the answer" : q.t === "tf" ? "True / False" : "Choose one"}</span><span class="pill">${practice ? "💡 Practice" : "📝 Exam"} · ${instant ? "instant" : "end"} marking</span></div>
-          <p class="qtext" style="margin:.4rem 0 0">${esc(q.q)}</p>
+          <p class="qtext" style="margin:.4rem 0 0">${rt(q.q)}</p>
         </div>
       </div>
       ${isNum ? numBox : `<div class="opts" role="radiogroup" aria-label="Answer options">${options}</div>`}
@@ -706,18 +708,18 @@
             const isCorrect = k === correct, isChosen = k === r.chosen;
             const cls = isCorrect ? "opt right" : isChosen ? "opt wrong" : "opt dim";
             const tag = isCorrect ? `<span class="tag tag-ok">Correct answer</span>` : isChosen ? `<span class="tag tag-bad">Your answer</span>` : "";
-            return `<div class="${cls}"><span class="key">${LETTERS[k]}</span><span class="grow">${esc(o)}</span>${tag}</div>`;
+            return `<div class="${cls}"><span class="key">${LETTERS[k]}</span><span class="grow">${rt(o)}</span>${tag}</div>`;
           })
           .join("");
         const badge = r.status === "ok" ? `<span class="tag tag-ok">✓ Correct</span>` : r.status === "bad" ? `<span class="tag tag-bad">✗ Wrong</span>` : `<span class="tag tag-skip">Not answered</span>`;
         return `<article class="card pad rcard" data-status="${r.status}" style="padding:1rem 1.2rem">
           <header class="qhead">
             <span class="qnum ${r.status === "ok" ? "qnum-ok" : r.status === "bad" ? "qnum-bad" : ""}">${r.i + 1}</span>
-            <div class="grow"><p style="margin:0;font-weight:550">${esc(q.q)}</p>
+            <div class="grow"><p style="margin:0;font-weight:550">${rt(q.q)}</p>
               <p class="xs muted" style="margin:.25rem 0 0">${UNIT} ${q.ch} · ${esc(CH_NAMES[q.ch])}</p></div>${badge}
           </header>
           <div class="opts">${optHtml}</div>
-          <p class="explain"><b>Explanation:</b> ${esc(q.e)}</p>
+          <p class="explain"><b>Explanation:</b> ${rt(q.e)}</p>
         </article>`;
       })
       .join("");
