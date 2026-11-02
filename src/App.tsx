@@ -90,6 +90,16 @@ const EXAMS: Exam[] = [
     accent: "from-sky-500 to-cyan-500",
   },
   {
+    id: "emd-s7",
+    subject: "Electromagnetics (EMD)",
+    title: "Sadiku 7th edition questions",
+    blurb: "Review questions with the book's answers, problems worked in full, and new application notes.",
+    href: "/emd-quiz/sadiku7.html",
+    badge: "New book",
+    icon: Zap,
+    accent: "from-orange-500 to-red-500",
+  },
+  {
     id: "comp-1-2",
     subject: "Computational Methods",
     title: "Chapters 1–2",
