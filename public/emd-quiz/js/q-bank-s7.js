@@ -1583,5 +1583,253 @@ window.QB = [
 "antennas must be made of fractals of carbon only"
 ],
 "e": "Fractals (Mandelbrot) are iteratively generated self-similar shapes with fractal dimension; applying them to antenna design yields compact, wide-/multi-band antennas."
+},
+{
+"ch": 3,
+"t": "num",
+"q": "Calculus: A = x² a_x + xy a_y. Evaluate ∫A·dl from (0,0) to (1,1) along the straight line y = x.",
+"a": 0.6666666667,
+"tol": 0.003333,
+"u": "",
+"tolPct": 0.5,
+"e": "A·dl = x² dx + xy dy (no z-part). On y = x: dy = dx, so A·dl = x² dx + x·x dx = 2x² dx.\n∫₀¹ 2x² dx = 2/3 = 0.6667."
+},
+{
+"ch": 3,
+"t": "num",
+"q": "Calculus: the same field A = x² a_x + xy a_y, now from (0,0) to (1,1) along the parabola y = x².",
+"a": 0.7333333333,
+"tol": 0.003667,
+"u": "",
+"tolPct": 0.5,
+"e": "On y = x²: dy = 2x dx, so A·dl = x² dx + x(x²)(2x dx) = (x² + 2x⁴) dx.\n∫₀¹ (x² + 2x⁴) dx = 1/3 + 2/5 = 11/15 = 0.7333.\nDifferent from the straight-line value 2/3, so A is NOT conservative (∂A_y/∂x = y ≠ ∂A_x/∂y = 0)."
+},
+{
+"ch": 3,
+"t": "num",
+"q": "Calculus: A = y a_x + z a_y + x a_z. Find ∫A·dl from (0,0,0) to (1,2,3) along the straight line r = t(1, 2, 3), 0 ≤ t ≤ 1.",
+"a": 5.5,
+"tol": 0.0275,
+"u": "",
+"tolPct": 0.5,
+"e": "Parametrise: x = t, y = 2t, z = 3t ⇒ dl = (1, 2, 3) dt.\nA = (y, z, x) = (2t, 3t, t) ⇒ A·dl = (2t)(1) + (3t)(2) + (t)(3) = 2t + 6t + 3t = 11t dt.\n∫₀¹ 11t dt = 11/2 = 5.5."
+},
+{
+"ch": 3,
+"t": "num",
+"q": "Calculus: A = −y a_x + x a_y. Find the circulation ∮A·dl counter-clockwise around the rectangle 0 ≤ x ≤ 2, 0 ≤ y ≤ 3.",
+"a": 12.0,
+"tol": 0.06,
+"u": "",
+"tolPct": 0.5,
+"e": "Stokes: ∮A·dl = ∬(∇×A)·dS with ∇×A = (∂A_y/∂x − ∂A_x/∂y) a_z = (1 + 1) a_z = 2a_z.\n∬ 2 dS = 2 × area = 2 × (2 × 3) = 12.\n(Direct check: bottom 0, right side ∫x dy = 2·3 = 6, top ∫−y dx = −3·(−2) = 6, left 0 ⇒ 12 ✓.)"
+},
+{
+"ch": 3,
+"t": "num",
+"q": "Calculus: A = 3ρ a_φ. Find ∮A·dl counter-clockwise around the circle ρ = 2, z = 0.",
+"a": 75.39822369,
+"tol": 0.377,
+"u": "",
+"tolPct": 0.5,
+"e": "dl = ρ dφ a_φ ⇒ A·dl = 3ρ · ρ dφ = 3ρ² dφ. At ρ = 2: 12 dφ.\n∮ = 12 × 2π = 24π = 75.4.\n(Check with Stokes: (∇×A)_z = (1/ρ)d(ρ·3ρ)/dρ = 6, flux through the disk = 6 × π(2²) = 24π ✓.)"
+},
+{
+"ch": 3,
+"t": "num",
+"q": "Calculus: F = ρ² a_ρ + z a_z. Find the flux of F out of the curved surface ρ = 3, 0 ≤ z ≤ 2 (full circle).",
+"a": 339.2920066,
+"tol": 1.696,
+"u": "",
+"tolPct": 0.5,
+"e": "On ρ = 3: F·a_ρ = ρ² = 9 and dS = ρ dφ dz = 3 dφ dz a_ρ. (The z a_z part is tangent to this surface.)\nΨ = ∫₀²dz ∫₀^(2π) 9 · 3 dφ = 27 × 2 × 2π = 108π = 339.3."
+},
+{
+"ch": 3,
+"t": "num",
+"q": "Calculus: A = r² a_r. Find the flux out of the sphere r = 3.",
+"a": 1017.87602,
+"tol": 5.089,
+"u": "",
+"tolPct": 0.5,
+"e": "On r = 3: A_r = 9 and dS = r² sin θ dθ dφ a_r = 9 sin θ dθ dφ a_r.\nΨ = 9 × 9 ∫₀^π sin θ dθ ∫₀^(2π) dφ = 81 × 2 × 2π = 324π = 1018."
+},
+{
+"ch": 3,
+"t": "num",
+"q": "Calculus: A = x a_x + y a_y + (x + y + 1) a_z. Find the flux upward (+a_z) through the square z = 0, 0 ≤ x, y ≤ 2.",
+"a": 12.0,
+"tol": 0.06,
+"u": "",
+"tolPct": 0.5,
+"e": "On z = 0: dS = dx dy a_z and A·dS = (x + y + 1) dx dy.\nΨ = ∫₀²∫₀² (x + y + 1) dx dy = [∫x dx](2) + [∫y dy](2) + 4 = 4 + 4 + 4 = 12."
+},
+{
+"ch": 3,
+"t": "num",
+"q": "Calculus: A = x²y a_x. Find the flux through the face x = 2 of the cube 0 ≤ x, y, z ≤ 2, outward (+a_x).",
+"a": 16.0,
+"tol": 0.08,
+"u": "",
+"tolPct": 0.5,
+"e": "On x = 2: A_x = 4y and dS = dy dz a_x.\nΨ = ∫₀²dz ∫₀² 4y dy = 2 × 4 × 2 = 16 (since ∫₀² y dy = 2)."
+},
+{
+"ch": 3,
+"t": "num",
+"q": "Calculus: ρ_v = ρ²z C/m³ inside the cylinder ρ ≤ 1, 0 ≤ z ≤ 2. Find the total charge.",
+"a": 3.141592654,
+"tol": 0.01571,
+"u": "C",
+"tolPct": 0.5,
+"e": "Q = ∭ρ_v dv = ∫₀²z dz ∫₀^(2π)dφ ∫₀¹ ρ² · ρ dρ = (2)(2π)(1/4) = π = 3.142 C."
+},
+{
+"ch": 3,
+"t": "num",
+"q": "Calculus: ρ_v = 10r² C/m³ inside a sphere of radius 0.5 m. Find the total charge.",
+"a": 0.7853981634,
+"tol": 0.003927,
+"u": "C",
+"tolPct": 0.5,
+"e": "dv = r² sin θ dr dθ dφ. Q = ∫₀^R 10r² · r² dr × 4π = 10 (R⁵/5)(4π) = 8πR⁵.\nR = 0.5 ⇒ R⁵ = 0.03125 ⇒ Q = 8π × 0.03125 = 0.7854 C."
+},
+{
+"ch": 3,
+"t": "num",
+"q": "Calculus: ρ_v = xyz C/m³ inside the cube 0 ≤ x, y, z ≤ 2. Find the total charge.",
+"a": 8.0,
+"tol": 0.04,
+"u": "C",
+"tolPct": 0.5,
+"e": "Q = ∫₀²x dx ∫₀²y dy ∫₀²z dz = 2 × 2 × 2 = 8 C (each integral is [x²/2]₀² = 2)."
+},
+{
+"ch": 3,
+"t": "num",
+"q": "Calculus: A = ρ² a_ρ + z a_z. Use the divergence theorem to find the total flux out of the closed cylinder ρ ≤ 1, 0 ≤ z ≤ 2.",
+"a": 18.84955592,
+"tol": 0.09425,
+"u": "",
+"tolPct": 0.5,
+"e": "∇·A = (1/ρ)∂(ρ·ρ²)/∂ρ + ∂z/∂z = 3ρ + 1.\nΨ = ∭(3ρ + 1) ρ dρ dφ dz = 2π × 2 × ∫₀¹ (3ρ² + ρ) dρ = 4π(1 + 1/2) = 6π = 18.85.\n(Faces: side 1·2π·2 = 4π, top 2·π = 2π, bottom 0 ⇒ 6π ✓.)"
+},
+{
+"ch": 3,
+"t": "num",
+"q": "Calculus: A = r² a_r. Use the divergence theorem to find the flux out of the sphere r = 2.",
+"a": 201.0619298,
+"tol": 1.005,
+"u": "",
+"tolPct": 0.5,
+"e": "∇·A = (1/r²)d(r²·r²)/dr = 4r.\nΨ = ∭4r · r² sin θ dr dθ dφ = 4 ∫₀² r³ dr × 4π = 4(4)(4π) = 64π = 201.1.\n(Direct: A_r = 4 on r = 2 and area 16π ⇒ 64π ✓.)"
+},
+{
+"ch": 3,
+"t": "num",
+"q": "Calculus: Use Stokes's theorem to find ∮A·dl counter-clockwise around the unit square 0 ≤ x, y ≤ 1 for A = −y² a_x + x² a_y.",
+"a": 2.0,
+"tol": 0.01,
+"u": "",
+"tolPct": 0.5,
+"e": "(∇×A)_z = ∂A_y/∂x − ∂A_x/∂y = 2x + 2y.\n∮A·dl = ∬(2x + 2y) dx dy = 2(1/2) + 2(1/2) = 2."
+},
+{
+"ch": 3,
+"t": "num",
+"q": "Calculus: A = ρ³ a_φ. Find ∮A·dl around the circle ρ = 2 and confirm with Stokes's theorem.",
+"a": 100.5309649,
+"tol": 0.5027,
+"u": "",
+"tolPct": 0.5,
+"e": "Line integral: A·dl = ρ³ · ρ dφ = ρ⁴ dφ = 16 dφ ⇒ ∮ = 32π = 100.5.\nStokes: (∇×A)_z = (1/ρ)d(ρ·ρ³)/dρ = 4ρ² ⇒ ∬4ρ² ρ dρ dφ = 4(2⁴/4)(2π) = 32π ✓."
+},
+{
+"ch": 4,
+"t": "num",
+"q": "Calculus: D = ρ² a_ρ C/m². Find the charge enclosed by the cylinder ρ = 2, 0 ≤ z ≤ 3 using Q = ∮D·dS.",
+"a": 150.7964474,
+"tol": 0.754,
+"u": "C",
+"tolPct": 0.5,
+"e": "Only the curved side carries flux (D has no z-part). On ρ = 2: D = 4 a_ρ, dS = 2 dφ dz a_ρ.\nQ = ∫₀³dz ∫₀^(2π) 4·2 dφ = 8 × 3 × 2π = 48π = 150.8 C.\n(Check: ∇·D = (1/ρ)d(ρ³)/dρ = 3ρ; ∭3ρ ρ dρ dφ dz = 3(8/3)(2π)(3) = 48π ✓.)"
+},
+{
+"ch": 4,
+"t": "num",
+"q": "Calculus: D = 5r a_r C/m². Find the charge inside the sphere r = 2 m.",
+"a": 502.6548246,
+"tol": 2.513,
+"u": "C",
+"tolPct": 0.5,
+"e": "∇·D = (1/r²)d(5r·r²)/dr = 15 ⇒ ρ_v = 15 C/m³ (uniform).\nQ = ∭15 dv = 15 × (4/3)π(2)³ = 160π = 502.7 C.\n(Flux check: D = 10 at r = 2, area 16π ⇒ 160π ✓.)"
+},
+{
+"ch": 4,
+"t": "num",
+"q": "Calculus: E = y a_x + x a_y V/m. Find V_AB = V_A − V_B = −∫_B^A E·dl for A(1, 2, 0) and B(0, 0, 0).",
+"a": -2.0,
+"tol": 0.02,
+"u": "V",
+"e": "E·dl = y dx + x dy = d(xy), so the field is conservative (E = −∇V with V = −xy + C).\nV_AB = −[xy]_(0,0)^(1,2) = −(2 − 0) = −2 V."
+},
+{
+"ch": 4,
+"t": "num",
+"q": "Calculus: E = 3x² a_x V/m. How much work (in joules) does the electric field do on a charge Q = 2 C moving from x = 0 to x = 2 m along the x-axis?",
+"a": 16.0,
+"tol": 0.16,
+"u": "J",
+"e": "W = Q∫E·dl = 2∫₀² 3x² dx = 2[x³]₀² = 2 × 8 = 16 J.\n(An external agent moving the charge slowly would supply −16 J, i.e. W_agent = −Q∫E·dl.)"
+},
+{
+"ch": 4,
+"t": "num",
+"q": "Calculus: An infinite line charge ρ_L = 5 nC/m lies on the z-axis. Find the potential difference V_AB between the points ρ = 1 m (A) and ρ = 3 m (B) by integrating E. (ε₀ = 8.854×10⁻¹²)",
+"a": 98.7404429,
+"tol": 0.4937,
+"u": "V",
+"tolPct": 0.5,
+"e": "E = ρ_L/(2πε₀ρ) a_ρ. V_AB = −∫_B^A E·dρ = −(ρ_L/2πε₀)∫₃¹ dρ/ρ = (ρ_L/2πε₀) ln(3/1).\n= 89.88 × ln 3 = 98.74 V (A at the smaller radius is at the higher potential)."
+},
+{
+"ch": 4,
+"t": "num",
+"q": "Calculus: A ring of radius a = 2 m carries ρ_L = 10 nC/m. Find the potential on its axis at h = 3 m by integrating dV = ρ_L dl/(4πε₀R). (ε₀ = 8.854×10⁻¹²)",
+"a": 313.2483602,
+"tol": 1.566,
+"u": "V",
+"tolPct": 0.5,
+"e": "Every element is the same distance R = √(a² + h²) = √13 = 3.606 m from the axis point, so\nV = ρ_L(2πa)/(4πε₀R) = ρ_L a/(2ε₀R) = (10⁻⁸)(2)/(2 × 8.854×10⁻¹² × 3.606) = 313.2 V."
+},
+{
+"ch": 4,
+"t": "num",
+"q": "Calculus: A circular disc of radius 2 m carries ρ_S = 5ρ nC/m² (ρ in metres). Find the total charge in nC.",
+"a": 83.7758041,
+"tol": 0.4189,
+"u": "nC",
+"tolPct": 0.5,
+"e": "Q = ∬ρ_S dS = ∫₀^(2π)dφ ∫₀² 5ρ · ρ dρ = 2π × 5 × [ρ³/3]₀² = 2π × 5 × 8/3 = 83.78 nC."
+},
+{
+"ch": 7,
+"t": "num",
+"q": "Calculus: A straight wire carrying 10 A runs along the z-axis from z = −2 m to z = 2 m. Use Biot–Savart, H = (I/4π)∫ρ dz/(ρ² + z²)^(3/2), to find |H| at ρ = 1 m.",
+"a": 1.423525087,
+"tol": 0.007118,
+"u": "A/m",
+"tolPct": 0.5,
+"e": "dH = (I dl × a_R)/(4πR²) gives |H| = (I ρ/4π)∫_(−2)^(2) dz/(ρ² + z²)^(3/2).\nWith ρ = 1: ∫ dz/(1 + z²)^(3/2) = z/√(1 + z²) ⇒ [2/√5 − (−2/√5)] = 1.789.\n|H| = (10/4π)(1)(1.789) = 1.424 A/m.\n(Compare the infinite wire: 10/(2π) = 1.59 A/m.)"
+},
+{
+"ch": 7,
+"t": "num",
+"q": "Calculus: A long straight wire carries 20 A. Find the magnetic flux per metre of length through the strip between ρ = 0.1 m and ρ = 0.5 m, Ψ/L = ∫B·dρ with B = μ₀I/(2πρ), in μWb/m. (μ₀ = 4π×10⁻⁷)",
+"a": 6.43775165,
+"tol": 0.03219,
+"u": "μWb/m",
+"tolPct": 0.5,
+"e": "Ψ/L = ∫_(0.1)^(0.5) μ₀I/(2πρ) dρ = (μ₀I/2π) ln(0.5/0.1) = (4π×10⁻⁷ × 20/2π) ln 5\n= 4×10⁻⁶ × 1.609 = 6.438×10^−6 Wb/m = 6.438 μWb/m."
 }
 ];
