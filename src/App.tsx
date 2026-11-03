@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import {
+  Activity,
   ArrowRight,
   BookOpen,
   Calculator,
@@ -118,6 +119,26 @@ const EXAMS: Exam[] = [
     badge: "Full paper",
     icon: Calculator,
     accent: "from-emerald-500 to-lime-500",
+  },
+  {
+    id: "bio-5",
+    subject: "Biomechanics",
+    title: "Chapter 5 · Applications of statics",
+    blurb: "Elbow, shoulder, neck, spine, hip, knee and ankle — the course slides, with worked problems.",
+    href: "/biomechanics-quiz/home.html",
+    badge: "Workouts",
+    icon: Activity,
+    accent: "from-red-500 to-orange-500",
+  },
+  {
+    id: "bio-all",
+    subject: "Biomechanics",
+    title: "Full exam · chapters 1–5",
+    blurb: "Units, forces, moments and equilibrium, then the joints.",
+    href: "/biomechanics-quiz/all.html",
+    badge: "Full paper",
+    icon: Activity,
+    accent: "from-teal-500 to-cyan-500",
   },
 ]
 
