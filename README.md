@@ -13,6 +13,7 @@ A React + Vite + shadcn/ui landing page that asks **"Which exam are you working 
 | Electromagnetics (EMD) · Sadiku 7th edition questions (14 chapters) | `/emd-quiz/sadiku7.html` |
 | Biomechanics · Chapter 5 — applications of statics (the slides) | `/biomechanics-quiz/home.html` |
 | Biomechanics · Full exam (chapters 1–5) | `/biomechanics-quiz/all.html` |
+| Biomechanics · Book problems solved step by step | `/biomechanics-quiz/problems.html` |
 | Computational Methods · Chapters 1–2 | `/computational-quiz/home.html` |
 | Computational Methods · Full exam (+ root finding) | `/computational-quiz/all.html` |
 
@@ -82,7 +83,7 @@ The EMD and Computational exams contain **workout questions**: type a number (`0
 
 The **Sadiku 7th edition** page (`sadiku7.html`) is a second EMD bank built from the newer book: 178 questions — review questions with the book's own answer keys, end-of-chapter problems worked in full, 25 **calculus/integration workouts** (line integrals and path dependence, circulation, flux through surfaces, volume integrals for charge, divergence theorem, Stokes, Gauss, potential and Biot–Savart integrals — every integral verified with sympy), and the new application notes (graphene, memristor, metamaterials, RFID…).
 
-The **Biomechanics** exam (`/biomechanics-quiz/`) follows *Fundamentals of Biomechanics* chapters 1–5 with Chapter 5 (statics applied to the elbow, shoulder, neck, spine, hip, knee and ankle) weighted most and matching the course slides; the Chapter 5 page contains only those questions. Book answers are cross-checked in code; where the printed example numbers are inconsistent with the book's own equations (knee Example 5.6, Problem 5.3) the bank uses the equation results.
+The **Biomechanics** exam (`/biomechanics-quiz/`) follows *Fundamentals of Biomechanics* chapters 1–5 with Chapter 5 (statics applied to the elbow, shoulder, neck, spine, hip, knee and ankle) weighted most and matching the course slides; the Chapter 5 page contains only those questions. Workout questions carry SVG free-body diagrams (67 of 81), and the **📚 Book problems** page (next to Revise) solves the textbook's exercise problems (chapters 2–5), its worked examples and the slide examples step by step with diagrams and the printed answers (63 problems, searchable and filterable), in case a test repeats them. Book answers are cross-checked in code; where the printed example numbers are inconsistent with the book's own equations (knee Example 5.6, Problem 5.3) the bank uses the equation results.
 
 Source notes for these courses (git-ignored, in `.claude/`): `emd/` (full Sadiku text, 131 worked examples, review questions, study guide) and `computational/` (OCR of the course slides, Chapra & Canale text, worked examples, study guide).
 

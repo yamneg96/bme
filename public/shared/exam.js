@@ -532,6 +532,7 @@
           <p class="qtext" style="margin:.4rem 0 0">${rt(q.q)}</p>
         </div>
       </div>
+      ${q.fig ? `<figure class="fig">${q.fig}</figure>` : ""}
       ${isNum ? numBox : `<div class="opts" role="radiogroup" aria-label="Answer options">${options}</div>`}
       <div id="fb" aria-live="polite">${fb}</div>
       <div class="qfoot">
@@ -733,6 +734,7 @@
             <div class="grow"><p style="margin:0;font-weight:550">${rt(q.q)}</p>
               <p class="xs muted" style="margin:.25rem 0 0">${UNIT} ${q.ch} · ${esc(CH_NAMES[q.ch])}</p></div>${badge}
           </header>
+          ${q.fig ? `<figure class="fig">${q.fig}</figure>` : ""}
           <div class="opts">${optHtml}</div>
           <p class="explain"><b>Explanation:</b> ${rt(q.e)}</p>
         </article>`;

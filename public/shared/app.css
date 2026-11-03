@@ -232,3 +232,14 @@ sub { font-size: .75em; line-height: 0; vertical-align: -.25em; }
 .answer { margin: .8rem 0 0; padding: .6rem .9rem; border-radius: 10px; background: var(--ok-soft); color: var(--text); border: 1px solid var(--ok); white-space: pre-line; }
 .cta { margin-top: 1.2rem; }
 .cta-final { text-align: center; } .cta-final .row { justify-content: center; margin-top: 1rem; }
+
+/* diagrams (free-body diagrams etc.) */
+.fig { margin: .4rem 0 1rem; padding: .6rem; border: 1px solid var(--border); border-radius: 14px; background: var(--surface-2); text-align: center; }
+.fig svg, .figsvg { width: 100%; max-width: 30rem; height: auto; display: inline-block; }
+
+/* book-problems page */
+.prob .problem { margin: .6rem 0 0; white-space: pre-line; }
+.prob details.solution { margin-top: .9rem; border: 1px solid var(--border); border-radius: 14px; background: var(--surface-2); padding: .2rem 1rem .9rem; }
+.prob details.solution summary { cursor: pointer; padding: .7rem 0; font-weight: 650; }
+.bookans { margin: .6rem 0 0; padding: .55rem .8rem; border-radius: 10px; background: var(--brand-soft); font-size: .9rem; white-space: pre-line; }
+.toolbar .chip { white-space: nowrap; }
