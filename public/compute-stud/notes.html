@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Computational Methods · Notes & summary</title>
+  <meta name="description" content="Computational Methods study route: step-by-step guide, summary notes, revision and resources." />
+  <meta name="theme-color" content="#1f5566" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231f5566'/%3E%3Cpath d='M22 72V50m22 22V34m22 38V24' stroke='white' stroke-width='10' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <script>try{var t=localStorage.getItem("exam-theme");if(t)document.documentElement.dataset.theme=t;else if(matchMedia("(prefers-color-scheme: dark)").matches)document.documentElement.dataset.theme="dark"}catch(e){}</script>
+  <link rel="stylesheet" href="/shared/app.css" />
+  <link rel="stylesheet" href="/compute-stud/css/stud.css" />
+</head>
+<body data-page="notes">
+  <header class="topbar">
+    <div class="wrap">
+      <a href="/compute-stud/" class="logo" title="Study hub">
+        <i aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 18v-5m5 5V8m5 10V5"/></svg></i>
+        Computational Methods
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="/?c=computational" class="navlink">← All exams</a>
+        <a href="index.html" class="navlink">Home</a>
+        <a href="guide.html" class="navlink">📘 Guide</a>
+        <a href="notes.html" class="navlink on" aria-current="page">📝 Notes</a>
+        <a href="revise.html" class="navlink">🔁 Revise</a>
+        <a href="resources.html" class="navlink">🎥 Resources</a>
+        <button id="theme-btn" class="theme-btn" type="button" aria-label="Switch light/dark theme">🌙</button>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap">
+    <section class="hero">
+      <p class="eyebrow">Summary</p>
+      <h1>Notes &amp; summary</h1>
+      <p>Your whole course on a few screens. Print this page (Ctrl+P) for a revision sheet.</p>
+    </section>
+    <section class="card pad" style="margin-bottom:1rem">
+      <h2 style="color:var(--brand)">The course in one paragraph</h2>
+      <p>Engineering problems are modelled by equations that are often impossible to solve exactly. <b>Numerical methods</b> replace calculus by arithmetic (e.g. <i>new = old + slope × step</i>) and give <b>approximate</b> answers. Because the answers are approximate you must always ask <b>how wrong</b>: measure it with <b>true / approximate relative error</b>, know that it comes from <b>round-off</b> (finite digits, IEEE 754) and <b>truncation</b> (cut-off series, finite step), and use the <b>Taylor series</b> to predict how the error shrinks (<b>O(hⁿ)</b>). Taylor series also give the <b>finite-difference</b> derivative formulas and the basis of root finding, integration and ODE solvers.</p>
+    </section>
+    <section class="card pad" style="margin-bottom:1rem">
+      <h2 style="color:var(--brand)">Big comparisons</h2>
+      <div class="tblwrap"><table class="cmp">
+        <tr><th></th><th>Round-off error</th><th>Truncation error</th></tr>
+        <tr><td>Source</td><td>Finite number of stored digits</td><td>Infinite series / process cut short</td></tr>
+        <tr><td>Example</td><td>π → 3.14159; 1/3 → 0.3333</td><td>eˣ ≈ 1 + x; sin 0.3 ≈ 0.3 − 0.3³/3!</td></tr>
+        <tr><td>Grows with</td><td>Number of operations</td><td>Large step size / few terms</td></tr>
+        <tr><td>Reduce by</td><td>Double precision, stable algorithms</td><td>More terms, smaller h, higher-order method</td></tr>
+      </table></div>
+      <div class="tblwrap"><table class="cmp">
+        <tr><th></th><th>Accuracy</th><th>Precision</th></tr>
+        <tr><td>Meaning</td><td>Closeness to true value</td><td>Closeness of repeated values</td></tr>
+        <tr><td>Hurt by</td><td>Systematic error</td><td>Random error</td></tr>
+        <tr><td>Measured by</td><td>mean − true</td><td>standard deviation</td></tr>
+      </table></div>
+      <div class="tblwrap"><table class="cmp">
+        <tr><th>Error type</th><th>Formula</th><th>Use when</th></tr>
+        <tr><td>True error E<sub>t</sub></td><td>V<sub>t</sub> − V<sub>a</sub></td><td>Truth known</td></tr>
+        <tr><td>True relative ε<sub>t</sub></td><td>E<sub>t</sub>/V<sub>t</sub> × 100 %</td><td>Truth known</td></tr>
+        <tr><td>Approximate relative ε<sub>a</sub></td><td>(new − old)/new × 100 %</td><td>Truth unknown (iterations)</td></tr>
+        <tr><td>Stop</td><td>|ε<sub>a</sub>| &lt; ε<sub>s</sub> = 0.5×10<sup>2−n</sup> %</td><td>n significant figures</td></tr>
+      </table></div>
+      <div class="tblwrap"><table class="cmp">
+        <tr><th>Finite difference</th><th>Formula</th><th>Order</th></tr>
+        <tr><td>Forward</td><td>[f(x+h) − f(x)]/h</td><td>O(h)</td></tr>
+        <tr><td>Backward</td><td>[f(x) − f(x−h)]/h</td><td>O(h)</td></tr>
+        <tr><td>Centered</td><td>[f(x+h) − f(x−h)]/(2h)</td><td>O(h²)</td></tr>
+      </table></div>
+      <div class="tblwrap"><table class="cmp">
+        <tr><th>Method</th><th>Type</th><th>Speed</th><th>Needs</th><th>Risk</th></tr>
+        <tr><td>Bisection</td><td>Bracketing</td><td>Linear (halves)</td><td>Sign change</td><td>Slow</td></tr>
+        <tr><td>False position</td><td>Bracketing</td><td>Linear, usually faster</td><td>Sign change</td><td>One end stalls</td></tr>
+        <tr><td>Newton–Raphson</td><td>Open</td><td>Quadratic</td><td>f′, good start</td><td>Diverges / f′≈0</td></tr>
+        <tr><td>Secant</td><td>Open</td><td>Superlinear (1.62)</td><td>Two starts</td><td>Diverges</td></tr>
+      </table></div>
+      <div class="tblwrap"><table class="cmp">
+        <tr><th>ODE method</th><th>Slope used</th><th>Global error</th><th>f-evaluations/step</th></tr>
+        <tr><td>Euler</td><td>Start of step</td><td>O(h)</td><td>1</td></tr>
+        <tr><td>Heun</td><td>Average of start and predicted end</td><td>O(h²)</td><td>2</td></tr>
+        <tr><td>RK4</td><td>Weighted 4 slopes</td><td>O(h⁴)</td><td>4</td></tr>
+      </table></div>
+    </section>
+    <section class="card pad" style="margin-bottom:1rem">
+      <h2 style="color:var(--brand)">Exam map (from your slides)</h2>
+      <div class="tblwrap"><table class="cmp">
+        <tr><th>Likely question</th><th>What to do</th><th>Guide topic</th></tr>
+        <tr><td>Babylonian iteration for √N</td><td>x ← ½(x + N/x); stop on ε<sub>a</sub></td><td><a href="guide.html#intro">Intro</a></td></tr>
+        <tr><td>Euler for the parachutist</td><td>v ← v + [g − (c/m)v]Δt</td><td><a href="guide.html#models">Models</a></td></tr>
+        <tr><td>Doubling time, tumour growth</td><td>μ = ln2/T<sub>d</sub>; V = (π/6)d³</td><td><a href="guide.html#why">Homework 1</a></td></tr>
+        <tr><td>Binary ↔ decimal, IEEE 754 bits</td><td>Powers of 2; 1+8+23, 1+11+52</td><td><a href="guide.html#numsys">Number systems</a></td></tr>
+        <tr><td>Compute E, ε<sub>t</sub>, ε<sub>a</sub></td><td>Mind sign and denominator</td><td><a href="guide.html#errors">Errors</a></td></tr>
+        <tr><td>Round-off or truncation?</td><td>Digits stored vs series cut</td><td><a href="guide.html#roundtrunc">Round-off vs truncation</a></td></tr>
+        <tr><td>Taylor estimate + error bound</td><td>Sum terms; bound by next derivative</td><td><a href="guide.html#taylor">Taylor</a>, <a href="guide.html#remainder">Remainder</a></td></tr>
+        <tr><td>ln x at 2.5 about 1</td><td>Orders 0–4; divergence</td><td><a href="guide.html#remainder">Remainder</a></td></tr>
+        <tr><td>Forward / backward / centered difference</td><td>Plug in; state O(·)</td><td><a href="guide.html#findiff">Finite differences</a></td></tr>
+        <tr><td>Stefan–Boltzmann error</td><td>ΔH ≈ 4AσeT³ΔT vs exact</td><td><a href="guide.html#errprop">Error propagation</a></td></tr>
+      </table></div>
+    </section>
+    <h2 style="color:var(--brand);margin:1.5rem 0 .5rem">Every formula, by topic</h2>
+    <div id="formulas"></div>
+  </main>
+  <footer>Based on the course slides (Chapters 1–2) and <i>Numerical Methods for Engineers</i> (Chapra &amp; Canale, 7th ed.), plus outside resources. Progress is saved in your browser only.</footer>
+  <script src="/compute-stud/js/data.js"></script>
+  <script src="/compute-stud/js/resources.js"></script>
+  <script src="/compute-stud/js/stud.js"></script>
+</body>
+</html>

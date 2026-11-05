@@ -132,6 +132,7 @@ export const CATEGORIES: Category[] = [
     items: [
       { id: "comp-1-2", kind: "exam", title: "Chapters 1–2 exam", blurb: "Numerical analysis, errors, Taylor series and finite differences.", href: "/computational-quiz/home.html", badge: "Workouts" },
       { id: "comp-all", kind: "exam", title: "Full exam · with root finding", blurb: "Adds bisection, false position and Newton–Raphson.", href: "/computational-quiz/all.html", badge: "Full paper" },
+      { id: "comp-stud", kind: "notes", title: "Study route: guide, notes & revision", blurb: "19 topics step by step, summary notes, flashcards and the best free videos and books.", href: "/compute-stud/", badge: "Study guide" },
       { id: "comp-learn", kind: "notes", title: "Revise: worked examples", blurb: "11 topics with key formulas and 22 worked examples.", href: "/computational-quiz/learn.html", badge: "Notes" },
     ],
   },
