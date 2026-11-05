@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Med – Physiology exam practice</title>
+  <meta name="description" content="Exam practice for Physiology lecture decks, with explanations." />
+  <meta name="theme-color" content="#8a3b5a" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%238a3b5a'/%3E%3Cpath d='M50 24v52M24 50h52' stroke='white' stroke-width='12' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <script>try{var t=localStorage.getItem("exam-theme");if(t)document.documentElement.dataset.theme=t;else if(matchMedia("(prefers-color-scheme: dark)").matches)document.documentElement.dataset.theme="dark"}catch(e){}</script>
+  <link rel="stylesheet" href="../shared/app.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <a href="/?c=med&amp;g=physiology" class="logo" title="Back to Med">
+        <i aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></i>
+        Med · Physiology
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="/?c=med" class="navlink">← All categories</a>
+        <a href="physiology-notes.html" class="navlink">Notes</a>
+        <a href="physiology.html" class="navlink on" aria-current="page">Exam</a>
+        <a href="micro.html" class="navlink">Microbiology</a>
+        <a href="pathology.html" class="navlink">Pathology</a>
+        <button id="theme-btn" class="theme-btn" type="button" aria-label="Switch light/dark theme" title="Switch light/dark theme">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <p class="eyebrow">Exam practice</p>
+      <h1>Physiology · Lecture-deck questions</h1>
+      <p>Questions built from the Physiology lecture decks. Pick a deck or take the full exam; <b data-total>–</b> questions, one per page, with explanations. Short notes for each deck are on the <a href="physiology-notes.html">Notes</a> page.</p>
+      <dl id="dash" class="dash" aria-label="Your dashboard"></dl>
+      <ul id="chapter-cards" class="chapters"></ul>
+    </section>
+
+    <div id="app" aria-live="polite"><noscript><p class="card pad">This exam needs JavaScript enabled.</p></noscript></div>
+  </main>
+
+  <footer>Questions are written from the course lecture decks; answers include explanations. Progress and stats are saved in your browser only.</footer>
+
+  <script>window.EXAM = { key: "phys", chapters: [1], unit: "Deck", prefix: "med-phys", defaultPerQ: 60, names: {"1": "The Circulatory System"} };</script>
+  <script defer src="js/q-physiology.js"></script>
+  <script defer src="../shared/exam.js"></script>
+</body>
+</html>

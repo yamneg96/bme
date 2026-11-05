@@ -35,7 +35,8 @@
         <label class="chk revised"><input type="checkbox" data-done="${t.id}" ${done[t.id] ? "checked" : ""} /> <span>Revised</span></label>
       </div>
       <p class="muted" style="margin:.6rem 0 0">${rt(t.summary)}</p>
-      ${t.formulas && t.formulas.length ? `<div class="formulas"><b class="sm">Key formulas</b><ul>${t.formulas.map((f) => `<li>${rt(f)}</li>`).join("")}</ul></div>` : ""}
+      ${t.formulas && t.formulas.length ? `<div class="formulas"><b class="sm">${esc(L.keyLabel || "Key formulas")}</b><ul>${t.formulas.map((f) => `<li>${rt(f)}</li>`).join("")}</ul></div>` : ""}
+      ${(t.sections || []).map((sec) => `<div class="nsec"><h3 class="h3">${rt(sec.h)}</h3><ul>${sec.items.map((x) => `<li>${rt(x)}</li>`).join("")}</ul></div>`).join("")}
       ${t.examples.map((ex, i) => `
         <details class="example" open>
           <summary><span class="exnum">Example ${i + 1}</span> ${rt(ex.title)}</summary>
@@ -45,9 +46,9 @@
             <p class="answer">✅ <b>Answer:</b> ${rt(ex.answer)}</p>
           </div>
         </details>`).join("")}
-      ${t.tips && t.tips.length ? `<div class="tips"><b class="sm">Watch out</b><ul>${t.tips.map((x) => `<li>${rt(x)}</li>`).join("")}</ul></div>` : ""}
+      ${t.tips && t.tips.length ? `<div class="tips"><b class="sm">${esc(L.tipsLabel || "Watch out")}</b><ul>${t.tips.map((x) => `<li>${rt(x)}</li>`).join("")}</ul></div>` : ""}
       <div class="cta row">
-        <a class="btn btn-primary" href="${link(t.ch, "practice")}">Practice ${esc(L.unit)} ${t.ch} worksheet →</a>
+        <a class="btn btn-primary" href="${link(t.ch, "practice")}">${esc(L.ctaLabel || "Practice " + L.unit + " " + t.ch + " worksheet")} →</a>
         <a class="btn btn-ghost" href="${link(t.ch, "exam")}">Exam-style test</a>
       </div>
     </section>`;

@@ -14,6 +14,9 @@ A React + Vite + shadcn/ui landing page that asks **"Which exam are you working 
 | Biomechanics · Chapter 5 — applications of statics (the slides) | `/biomechanics-quiz/home.html` |
 | Biomechanics · Full exam (chapters 1–5) | `/biomechanics-quiz/all.html` |
 | Biomechanics · Book problems solved step by step | `/biomechanics-quiz/problems.html` |
+| Med · Microbiology & Infection (10 lecture decks, 375 questions) + notes | `/med-quiz/micro.html`, `/med-quiz/micro-notes.html` |
+| Med · Pathology (5 decks, 257 questions) + notes | `/med-quiz/pathology.html`, `/med-quiz/pathology-notes.html` |
+| Med · Physiology (circulatory system, 74 questions) + notes | `/med-quiz/physiology.html`, `/med-quiz/physiology-notes.html` |
 | Computational Methods · Chapters 1–2 | `/computational-quiz/home.html` |
 | Computational Methods · Full exam (+ root finding) | `/computational-quiz/all.html` |
 
@@ -27,6 +30,7 @@ A React + Vite + shadcn/ui landing page that asks **"Which exam are you working 
 │   ├── economics-quiz/     Economics exam (question bank only, uses shared/)
 │   ├── emd-quiz/           Electromagnetics exam — 131 questions, 93 numeric workouts with step-by-step solutions
 │   ├── biomechanics-quiz/  Biomechanics exam — 149 questions (94 on the joints, Ch 5), 81 numeric workouts, Revise page
+│   ├── med-quiz/           Med — one exam page and one short-notes page per subject group; each deck is a "chapter" (16 decks)
 │   ├── computational-quiz/ Computational Methods exam — 51 questions, 33 numeric workouts
 │   └── optics-quiz/        Optics exam (vanilla JS + Tailwind CSS)
 ├── .claude/                Local notes: module .md files (Economics text, Optics slides OCR) — git-ignored
@@ -53,9 +57,11 @@ Add more components with `npx shadcn@latest add <component>`.
 
 ## Landing page
 
+- Two levels: category cards first (Economics, Optics, EMD, Computational Methods, Biomechanics, Med), then a category page listing its exams, notes and (for Med) lecture decks with a subject filter. The state lives in the URL (`?c=med&g=micro`) so Back and links work. The catalogue is `src/catalog.ts`; the folder names under `.claude/` are the category names (extracted text of the Med decks is in `.claude/Med/text/`, git-ignored).
+
 - Animated gradient/grid background and staggered card entrance; cards lift on hover and the page fades out as you open an exam.
 - Light / dark toggle (top right). Press `d` to toggle too — it follows the system theme by default.
-- To add an exam, add an entry to the `EXAMS` array in `src/App.tsx` and put its static files under `public/<name>/`.
+- To add an exam or category, edit `src/catalog.ts` and put its static files under `public/<name>/`.
 
 ## Practice / exam modes (both exams)
 
