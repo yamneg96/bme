@@ -7,6 +7,7 @@ import {
   GraduationCap,
   Moon,
   NotebookPen,
+  Shapes,
   Sparkles,
   Sun,
   type LucideIcon,
@@ -355,6 +356,11 @@ function DeckRow({ deck, link }: { deck: Deck; link: LinkFn }) {
         <a {...link(deck.notesHref)} className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition hover:bg-accent">
           <NotebookPen className="size-3.5" /> Notes
         </a>
+        {deck.diagramsHref && (
+          <a {...link(deck.diagramsHref)} className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition hover:bg-accent">
+            <Shapes className="size-3.5" /> Diagrams
+          </a>
+        )}
         <a {...link(deck.examHref)} className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition hover:opacity-90">
           <GraduationCap className="size-3.5" /> Exam
         </a>

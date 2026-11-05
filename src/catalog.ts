@@ -27,6 +27,7 @@ export type Deck = {
   blurb: string
   notesHref: string
   examHref: string
+  diagramsHref?: string
 }
 
 export type Category = {
@@ -69,6 +70,9 @@ const pathDecks: [string, string, string][] = [
   ["Pediatric diseases", "Common diseases of infancy and childhood.", "path-5"],
 ]
 
+// decks that have diagram questions (on the separate diagrams page)
+const DIAGRAM_DECKS = new Set(["micro-3", "micro-4", "micro-5", "micro-6", "micro-7", "micro-10", "path-2", "path-3", "path-4", "phys-1"])
+
 const deck = (group: string, page: string, [title, blurb, id]: [string, string, string], n: number): Deck => ({
   id,
   group,
@@ -76,6 +80,7 @@ const deck = (group: string, page: string, [title, blurb, id]: [string, string, 
   blurb,
   notesHref: `/med-quiz/${page}-notes.html#${id}`,
   examHref: `/med-quiz/${page}.html?ch=${n}&${practice}`,
+  diagramsHref: DIAGRAM_DECKS.has(id) ? `/med-quiz/${page}-diagrams.html?ch=${n}&${practice}` : undefined,
 })
 
 export const CATEGORIES: Category[] = [
@@ -155,10 +160,13 @@ export const CATEGORIES: Category[] = [
     items: [
       { id: "med-micro-exam", kind: "exam", group: "micro", title: "Microbiology & Infection · full exam", blurb: "All ten microbiology decks in one exam.", href: `/med-quiz/micro.html?${practice}`, badge: "Full paper" },
       { id: "med-micro-notes", kind: "notes", group: "micro", title: "Microbiology & Infection · notes", blurb: "Short notes for every microbiology deck.", href: "/med-quiz/micro-notes.html", badge: "Notes" },
+      { id: "med-micro-diagrams", kind: "exam", group: "micro", title: "Microbiology & Infection · diagram questions", blurb: "28 questions on growth curves, virus structure, oxygen tubes, shapes and more.", href: `/med-quiz/micro-diagrams.html?${practice}`, badge: "Diagrams" },
       { id: "med-path-exam", kind: "exam", group: "path", title: "Pathology · full exam", blurb: "Healing, neoplasia, hypersensitivity, genetic and pediatric diseases.", href: `/med-quiz/pathology.html?${practice}`, badge: "Full paper" },
       { id: "med-path-notes", kind: "notes", group: "path", title: "Pathology · notes", blurb: "Short notes for every pathology deck.", href: "/med-quiz/pathology-notes.html", badge: "Notes" },
+      { id: "med-path-diagrams", kind: "exam", group: "path", title: "Pathology · diagram questions", blurb: "14 questions on the cell cycle, pedigrees and hypersensitivity types.", href: `/med-quiz/pathology-diagrams.html?${practice}`, badge: "Diagrams" },
       { id: "med-phys-exam", kind: "exam", group: "phys", title: "Circulatory system · exam", blurb: "Blood, heart, vessels, fetal circulation and lymphatics.", href: `/med-quiz/physiology.html?${practice}`, badge: "Full paper" },
       { id: "med-phys-notes", kind: "notes", group: "phys", title: "Circulatory system · notes", blurb: "Short notes on the circulatory system.", href: "/med-quiz/physiology-notes.html", badge: "Notes" },
+      { id: "med-phys-diagrams", kind: "exam", group: "phys", title: "Circulatory system · diagram questions", blurb: "19 questions on heart chambers and valves, fetal circulation, vessel walls and capillaries.", href: `/med-quiz/physiology-diagrams.html?${practice}`, badge: "Diagrams" },
     ],
     decks: [
       ...microDecks.map((d, i) => deck("micro", "micro", d, i + 1)),

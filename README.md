@@ -57,7 +57,7 @@ Add more components with `npx shadcn@latest add <component>`.
 
 ## Med figures and animations
 
-The Med exams include 61 figure questions (SVG diagrams drawn for the course: growth curve, oxygen tubes, bacterial shapes, virus structure and symmetry, chain of infection, cell cycle, pedigrees, hypersensitivity types, heart and valves, fetal circulation, vessel wall, capillary types) spread evenly through each deck. The notes pages also show the diagrams plus step-through animations (viral replication, growth phases, type I hypersensitivity, blood flow through the heart) with Back / Play / Next controls. Diagrams are generated in code, not copied from the slides.
+The Med subjects each have a separate Diagrams page (`/med-quiz/<subject>-diagrams.html`, 61 questions, kept apart from the regular exams) using SVG diagrams drawn for the course: growth curve, oxygen tubes, bacterial shapes, virus structure and symmetry, chain of infection, cell cycle, pedigrees, hypersensitivity types, heart and valves, fetal circulation, vessel wall, capillary types. The notes pages also show the diagrams plus step-through animations (viral replication, growth phases, type I hypersensitivity, blood flow through the heart) with Back / Play / Next controls. Diagrams are generated in code, not copied from the slides.
 
 ## Landing page
 

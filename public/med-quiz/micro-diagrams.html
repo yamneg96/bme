@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Med – Microbiology &amp; Infection diagram questions</title>
+  <meta name="description" content="Diagram questions for Microbiology &amp; Infection." />
+  <meta name="theme-color" content="#8a3b5a" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%238a3b5a'/%3E%3Cpath d='M50 24v52M24 50h52' stroke='white' stroke-width='12' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <script>try{var t=localStorage.getItem("exam-theme");if(t)document.documentElement.dataset.theme=t;else if(matchMedia("(prefers-color-scheme: dark)").matches)document.documentElement.dataset.theme="dark"}catch(e){}</script>
+  <link rel="stylesheet" href="../shared/app.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <a href="/?c=med&amp;g=micro" class="logo" title="Back to Med">
+        <i aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></i>
+        Med · Microbiology &amp; Infection
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="/?c=med" class="navlink">← All categories</a>
+        <a href="micro-notes.html" class="navlink">Notes</a>
+        <a href="micro.html" class="navlink">Exam</a>
+        <a href="micro-diagrams.html" class="navlink on" aria-current="page">Diagrams</a>
+        <a href="pathology.html" class="navlink">Pathology</a>
+        <a href="physiology.html" class="navlink">Physiology</a>
+        <button id="theme-btn" class="theme-btn" type="button" aria-label="Switch light/dark theme" title="Switch light/dark theme">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <p class="eyebrow">Diagram practice</p>
+      <h1>Microbiology &amp; Infection · Diagram questions</h1>
+      <p>Questions that ask you to read a diagram: label structures, identify phases, patterns and mechanisms. <b data-total>–</b> questions across the decks below. Regular questions are on the <a href="micro.html">Exam</a> page.</p>
+      <dl id="dash" class="dash" aria-label="Your dashboard"></dl>
+      <ul id="chapter-cards" class="chapters"></ul>
+    </section>
+
+    <div id="app" aria-live="polite"><noscript><p class="card pad">This exam needs JavaScript enabled.</p></noscript></div>
+  </main>
+
+  <footer>Diagrams are schematic drawings made for this course. Progress and stats are saved in your browser only.</footer>
+
+  <script>window.EXAM = { key: "microfig", chapters: [3, 4, 5, 6, 7, 10], unit: "Deck", prefix: "med-micro-fig", defaultPerQ: 60, names: {"3": "General Microbiology: slides 34–82 (2025)", "4": "Microbial Growth, Survival and Death", "5": "Cultivation of Microorganisms and Normal Flora", "6": "Overview of Virology", "7": "Principles of Infection Prevention and Control", "10": "Overview of Mycology"} };</script>
+  <script defer src="js/q-micro-fig.js"></script>
+  <script defer src="../shared/exam.js"></script>
+</body>
+</html>
