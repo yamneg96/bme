@@ -248,3 +248,12 @@ sub { font-size: .75em; line-height: 0; vertical-align: -.25em; }
 .nsec { margin-top: 1.1rem; }
 .nsec .h3 { font-size: 1.05rem; margin-bottom: .35rem; }
 .nsec ul { margin: 0; padding-left: 1.15rem; display: grid; gap: .3rem; font-size: .95rem; }
+
+/* notes: figures and step-through animations */
+.figt { font-weight: 600; font-size: .9rem; margin-bottom: .3rem; text-align: left; }
+.figc, .animcap { color: var(--muted); font-size: .88rem; margin: .4rem 0 0; text-align: left; }
+.anim { margin: 1rem 0; padding: .8rem; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+.animh { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; }
+.animstage { margin: .5rem 0 0; }
+.animcap { min-height: 2.6em; color: var(--text); }
+.animctl { gap: .5rem; flex-wrap: wrap; }

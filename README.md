@@ -55,6 +55,10 @@ npx shadcn@latest init --preset b0 --template vite --pointer
 
 Add more components with `npx shadcn@latest add <component>`.
 
+## Med figures and animations
+
+The Med exams include 61 figure questions (SVG diagrams drawn for the course: growth curve, oxygen tubes, bacterial shapes, virus structure and symmetry, chain of infection, cell cycle, pedigrees, hypersensitivity types, heart and valves, fetal circulation, vessel wall, capillary types) spread evenly through each deck. The notes pages also show the diagrams plus step-through animations (viral replication, growth phases, type I hypersensitivity, blood flow through the heart) with Back / Play / Next controls. Diagrams are generated in code, not copied from the slides.
+
 ## Landing page
 
 - Two levels: category cards first (Economics, Optics, EMD, Computational Methods, Biomechanics, Med), then a category page listing its exams, notes and (for Med) lecture decks with a subject filter. The state lives in the URL (`?c=med&g=micro`) so Back and links work. The catalogue is `src/catalog.ts`; the folder names under `.claude/` are the category names (extracted text of the Med decks is in `.claude/Med/text/`, git-ignored).

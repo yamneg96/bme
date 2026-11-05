@@ -36,6 +36,8 @@
       </div>
       <p class="muted" style="margin:.6rem 0 0">${rt(t.summary)}</p>
       ${t.formulas && t.formulas.length ? `<div class="formulas"><b class="sm">${esc(L.keyLabel || "Key formulas")}</b><ul>${t.formulas.map((f) => `<li>${rt(f)}</li>`).join("")}</ul></div>` : ""}
+      ${(t.anims || []).map((an, ai) => `<div class="anim" data-anim="${t.id}:${ai}"><div class="animh"><b>▶ ${esc(an.title)}</b><span class="xs muted animn"></span></div><div class="fig animstage"></div><p class="animcap"></p><div class="row animctl"><button type="button" class="btn btn-ghost" data-a="prev">← Back</button><button type="button" class="btn btn-primary" data-a="play">▶ Play</button><button type="button" class="btn btn-ghost" data-a="next">Next →</button></div></div>`).join("")}
+      ${(t.figs || []).map((f) => `<figure class="fig"><figcaption class="figt">${esc(f.title)}</figcaption>${f.svg}<figcaption class="figc">${rt(f.caption || "")}</figcaption></figure>`).join("")}
       ${(t.sections || []).map((sec) => `<div class="nsec"><h3 class="h3">${rt(sec.h)}</h3><ul>${sec.items.map((x) => `<li>${rt(x)}</li>`).join("")}</ul></div>`).join("")}
       ${t.examples.map((ex, i) => `
         <details class="example" open>
@@ -69,9 +71,29 @@
       </div>
     </div>`;
 
+
+  /* step-through animations */
+  $$(".anim").forEach((box) => {
+    const [tid, ai] = box.dataset.anim.split(":");
+    const an = L.topics.find((t) => t.id === tid).anims[+ai];
+    const fr = an.frames;
+    let i = 0, timer = null;
+    const stage = $(".animstage", box), cap = $(".animcap", box), num = $(".animn", box), play = $('[data-a="play"]', box);
+    const show = (n) => { i = (n + fr.length) % fr.length; stage.innerHTML = fr[i].svg; cap.textContent = fr[i].cap; num.textContent = `step ${i + 1} of ${fr.length}`; };
+    const stop = () => { if (timer) { clearInterval(timer); timer = null; } play.textContent = "▶ Play"; };
+    box.addEventListener("click", (e) => {
+      const b = e.target.closest("[data-a]"); if (!b) return;
+      if (b.dataset.a === "next") { stop(); show(i + 1); }
+      else if (b.dataset.a === "prev") { stop(); show(i - 1); }
+      else if (timer) stop();
+      else { play.textContent = "❚❚ Pause"; timer = setInterval(() => show(i + 1), 2600); show(i + 1); }
+    });
+    show(0);
+  });
+
   function updateProgress() {
     const n = L.topics.filter((t) => done[t.id]).length;
-    $("#toc-progress").textContent = `${n} of ${L.topics.length} topics revised · ${nExamples} worked examples`;
+    $("#toc-progress").textContent = `${n} of ${L.topics.length} topics revised${nExamples ? ` · ${nExamples} worked examples` : ""}`;
     $$("[data-toc]").forEach((a) => { $(".tick", a).textContent = done[a.dataset.toc] ? "✓" : "○"; });
   }
   updateProgress();
