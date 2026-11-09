@@ -4,6 +4,7 @@ import {
   Calculator,
   Stethoscope,
   Telescope,
+  Users,
   Zap,
   type LucideIcon,
 } from "lucide-react"
@@ -134,6 +135,17 @@ export const CATEGORIES: Category[] = [
       { id: "comp-all", kind: "exam", title: "Full exam · with root finding", blurb: "Adds bisection, false position and Newton–Raphson.", href: "/computational-quiz/all.html", badge: "Full paper" },
       { id: "comp-stud", kind: "notes", title: "Study route: guide, notes & revision", blurb: "19 topics step by step, summary notes, flashcards and the best free videos and books.", href: "/compute-stud/", badge: "Study guide" },
       { id: "comp-learn", kind: "notes", title: "Revise: worked examples", blurb: "11 topics with key formulas and 22 worked examples.", href: "/computational-quiz/learn.html", badge: "Notes" },
+    ],
+  },
+  {
+    id: "inclusiveness",
+    name: "Inclusiveness",
+    tagline: "Inclusiveness (SNIE 1012)",
+    blurb: "Concepts and principles of inclusion, disability and vulnerability, barriers, and the special needs of persons with disabilities.",
+    icon: Users,
+    accent: "from-rose-500 to-pink-500",
+    items: [
+      { id: "incl-1-3", kind: "exam", title: "Chapters 1–3 exam", blurb: "84 questions: inclusion principles, models of disability, vulnerability, barriers and special needs.", href: "/inclusiveness-quiz/home.html", badge: "New" },
     ],
   },
   {
