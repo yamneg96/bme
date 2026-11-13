@@ -17,6 +17,7 @@ A React + Vite + shadcn/ui landing page that asks **"Which exam are you working 
 | Med · Microbiology & Infection (10 lecture decks, 375 questions) + notes | `/med-quiz/micro.html`, `/med-quiz/micro-notes.html` |
 | Med · Pathology (5 decks, 257 questions) + notes | `/med-quiz/pathology.html`, `/med-quiz/pathology-notes.html` |
 | Med · Physiology (circulatory system, 74 questions) + notes | `/med-quiz/physiology.html`, `/med-quiz/physiology-notes.html` |
+| Med · Embryology (embryonic + fetal period, 116 questions) + notes + diagrams | `/med-quiz/embryology.html`, `/med-quiz/embryology-notes.html`, `/med-quiz/embryology-diagrams.html` |
 | Computational Methods · Chapters 1–2 | `/computational-quiz/home.html` |
 | Computational Methods · Full exam (+ root finding) | `/computational-quiz/all.html` |
 

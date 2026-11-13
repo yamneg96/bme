@@ -49,6 +49,7 @@ export const MED_GROUPS = [
   { id: "micro", name: "Microbiology & Infection" },
   { id: "path", name: "Pathology" },
   { id: "phys", name: "Physiology" },
+  { id: "embryo", name: "Embryology" },
 ]
 
 const microDecks: [string, string, string][] = [
@@ -63,6 +64,10 @@ const microDecks: [string, string, string][] = [
   ["Overview of parasitology", "Protozoa, helminths, hosts, vectors, transmission and life cycles.", "micro-9"],
   ["Overview of mycology", "Fungal structure, spores, mycoses, virulence and host defence.", "micro-10"],
 ]
+const embryoDecks: [string, string, string][] = [
+  ["Embryonic period (3rd–8th weeks)", "Gastrulation, notochord, neurulation, somites, folding, organogenesis and the week-by-week changes.", "embryo-1"],
+  ["Fetal period (9th week to birth)", "Growth and dating, viability, monthly changes, IUGR, postmaturity and prenatal assessment.", "embryo-2"],
+]
 const pathDecks: [string, string, string][] = [
   ["Healing and repair", "Regeneration, fibrosis, wound healing and its complications.", "path-1"],
   ["Neoplasia", "Tumour nomenclature, biology, carcinogenesis and spread.", "path-2"],
@@ -72,7 +77,7 @@ const pathDecks: [string, string, string][] = [
 ]
 
 // decks that have diagram questions (on the separate diagrams page)
-const DIAGRAM_DECKS = new Set(["micro-3", "micro-4", "micro-5", "micro-6", "micro-7", "micro-10", "path-2", "path-3", "path-4", "phys-1"])
+const DIAGRAM_DECKS = new Set(["micro-3", "micro-4", "micro-5", "micro-6", "micro-7", "micro-10", "path-2", "path-3", "path-4", "phys-1", "embryo-1", "embryo-2"])
 
 const deck = (group: string, page: string, [title, blurb, id]: [string, string, string], n: number): Deck => ({
   id,
@@ -166,7 +171,7 @@ export const CATEGORIES: Category[] = [
     id: "med",
     name: "Med",
     tagline: "Medical sciences lecture decks",
-    blurb: "Microbiology and infection control, pathology and physiology — an exam and short notes for every lecture deck.",
+    blurb: "Microbiology and infection control, pathology, physiology and embryology — an exam and short notes for every lecture deck.",
     icon: Stethoscope,
     accent: "from-sky-500 to-blue-600",
     groups: MED_GROUPS,
@@ -180,10 +185,14 @@ export const CATEGORIES: Category[] = [
       { id: "med-phys-exam", kind: "exam", group: "phys", title: "Circulatory system · exam", blurb: "Blood, heart, vessels, fetal circulation and lymphatics.", href: `/med-quiz/physiology.html?${practice}`, badge: "Full paper" },
       { id: "med-phys-notes", kind: "notes", group: "phys", title: "Circulatory system · notes", blurb: "Short notes on the circulatory system.", href: "/med-quiz/physiology-notes.html", badge: "Notes" },
       { id: "med-phys-diagrams", kind: "exam", group: "phys", title: "Circulatory system · diagram questions", blurb: "19 questions on heart chambers and valves, fetal circulation, vessel walls and capillaries.", href: `/med-quiz/physiology-diagrams.html?${practice}`, badge: "Diagrams" },
+      { id: "med-embryo-exam", kind: "exam", group: "embryo", title: "Embryology · exam", blurb: "Embryonic (weeks 3–8) and fetal periods: 116 questions.", href: `/med-quiz/embryology.html?${practice}`, badge: "Full paper" },
+      { id: "med-embryo-notes", kind: "notes", group: "embryo", title: "Embryology · notes", blurb: "Short notes on the embryonic and fetal periods.", href: "/med-quiz/embryology-notes.html", badge: "Notes" },
+      { id: "med-embryo-diagrams", kind: "exam", group: "embryo", title: "Embryology · diagram questions", blurb: "13 questions on mesoderm subdivisions, neurulation and fetal proportions.", href: `/med-quiz/embryology-diagrams.html?${practice}`, badge: "Diagrams" },
     ],
     decks: [
       ...microDecks.map((d, i) => deck("micro", "micro", d, i + 1)),
       ...pathDecks.map((d, i) => deck("path", "pathology", d, i + 1)),
+      ...embryoDecks.map((d, i) => deck("embryo", "embryology", d, i + 1)),
       deck("phys", "physiology", ["The circulatory system", "Blood, heart, vessels, major arteries and veins, fetal circulation, lymphatics.", "phys-1"], 1),
     ],
   },
